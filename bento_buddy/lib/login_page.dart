@@ -13,9 +13,7 @@ class LoginPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24),
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(
-              'assets/background.png',
-            ), // Ganti sesuai path gambar
+            image: AssetImage('assets/background.png'),
             fit: BoxFit.cover,
           ),
         ),
@@ -56,8 +54,8 @@ class LoginPage extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: ElevatedButton(
                   onPressed: () {
-                    print('Username: ${usernameController.text}');
-                    print('Password: ${passwordController.text}');
+                    debugPrint('Username: ${usernameController.text}');
+                    debugPrint('Password: ${passwordController.text}');
                     // TODO: Tambahkan aksi login
                   },
                   style: ElevatedButton.styleFrom(
@@ -79,7 +77,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  InputDecoration _inputDecoration(String hintText) {
+  static InputDecoration _inputDecoration(String hintText) {
     return InputDecoration(
       hintText: hintText,
       filled: true,

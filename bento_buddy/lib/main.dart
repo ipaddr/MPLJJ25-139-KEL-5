@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Bento Buddy',
-      home: const HomePage(),
+      home: const HomePage(), // ✅ Cocok dengan nama class
     );
   }
 }
