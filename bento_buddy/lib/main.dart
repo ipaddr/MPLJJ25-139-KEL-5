@@ -1,8 +1,11 @@
+import 'package:bento_buddy/nerimabantuan.dart';
+import 'package:bento_buddy/pengajuanpage.dart';
 import 'package:flutter/material.dart';
 import 'splash_screen.dart';
 import 'login_page.dart';
 import 'home_page.dart';
 import 'beranda.dart';
+import 'nerimabantuan.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +24,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
-        '/beranda': (context) => const DataSekolahPage(),
+        '/beranda': (context) => const NerimaBantuan(),
       },
     );
   }
