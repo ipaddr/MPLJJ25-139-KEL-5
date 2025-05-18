@@ -1,116 +1,172 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const RegisterPage(),
-    );
-  }
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class RegisterPage extends StatelessWidget {
-  const RegisterPage({super.key});
+class _RegisterPageState extends State<RegisterPage> {
+  String? selectedStatus;
+  final List<String> statuses = [
+    'Admin Sekolah',
+    'Admin Catering',
+    'Admin Pemerintah',
+    'Umum',
+  ];
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController idController = TextEditingController();
+  final TextEditingController institutionNameController =
+      TextEditingController();
+  final TextEditingController institutionAddressController =
+      TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Background shapes (you can replace these with Image.asset for more precise shape)
-            Positioned(top: 0, left: 0, child: _abstractTopLeft()),
-            Positioned(bottom: 0, right: 0, child: _abstractBottomRight()),
-            Positioned(top: 20, right: 20, child: _circleDeco()),
-            Positioned(bottom: 20, left: 20, child: _circleDeco()),
-
-            // Form content
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'REGISTER',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-                      ),
+      body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/background.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'REGISTER',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.underline,
+                      color: Color.fromARGB(
+                        255,
+                        49,
+                        43,
+                        43,
+                      ), // Judul juga putih
                     ),
-                    const SizedBox(height: 30),
-                    ...List.generate(
-                      5,
-                      (index) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: TextField(
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.grey[300],
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[800],
-                        shape: const StadiumBorder(),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 40,
-                          vertical: 12,
-                        ),
-                      ),
-                      child: const Text("Submit"),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: 20),
+
+                // Status
+                DropdownButtonFormField<String>(
+                  value: selectedStatus,
+                  hint: const Text('Status'),
+                  items:
+                      statuses.map((status) {
+                        return DropdownMenuItem(
+                          value: status,
+                          child: Text(status),
+                        );
+                      }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedStatus = value;
+                    });
+                  },
+                  decoration: _inputDecoration(),
+                ),
+                const SizedBox(height: 12),
+
+                // Nama Lengkap
+                TextFormField(
+                  controller: nameController,
+                  decoration: _inputDecoration(hintText: 'Nama Lengkap'),
+                ),
+                const SizedBox(height: 12),
+
+                // Nomor Identitas
+                TextFormField(
+                  controller: idController,
+                  decoration: _inputDecoration(hintText: 'Nomor Identitas'),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 12),
+
+                // Nama Instansi
+                TextFormField(
+                  controller: institutionNameController,
+                  decoration: _inputDecoration(hintText: 'Nama Instansi'),
+                ),
+                const SizedBox(height: 12),
+
+                // Alamat Instansi
+                TextFormField(
+                  controller: institutionAddressController,
+                  decoration: _inputDecoration(hintText: 'Alamat Instansi'),
+                ),
+                const SizedBox(height: 12),
+
+                // Username
+                TextFormField(
+                  controller: usernameController,
+                  decoration: _inputDecoration(hintText: 'Username'),
+                ),
+                const SizedBox(height: 12),
+
+                // Password
+                TextFormField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: _inputDecoration(hintText: 'Password'),
+                ),
+                const SizedBox(height: 20),
+
+                // Tombol Register
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // TODO: Tambahkan aksi untuk register
+                      print('Register ditekan');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade700,
+                      foregroundColor: Colors.white, // Warna teks putih
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child: Text('Register'),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  // Decorative shapes
-  Widget _abstractTopLeft() => Container(
-    width: 100,
-    height: 100,
-    decoration: const BoxDecoration(
-      color: Color(0xFF002E6E), // dark blue
-      borderRadius: BorderRadius.only(bottomRight: Radius.circular(80)),
-    ),
-  );
-
-  Widget _abstractBottomRight() => Container(
-    width: 100,
-    height: 100,
-    decoration: const BoxDecoration(
-      color: Color(0xFF002E6E),
-      borderRadius: BorderRadius.only(topLeft: Radius.circular(80)),
-    ),
-  );
-
-  Widget _circleDeco() => Row(
-    children: const [
-      Icon(Icons.circle, size: 10, color: Colors.orange),
-      SizedBox(width: 4),
-      Icon(Icons.circle, size: 10, color: Colors.green),
-    ],
-  );
+  InputDecoration _inputDecoration({String? hintText}) {
+    return InputDecoration(
+      hintText: hintText,
+      filled: true,
+      fillColor: Colors.grey.shade300,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+    );
+  }
 }

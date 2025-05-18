@@ -13,9 +13,7 @@ class LoginPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24),
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(
-              'assets/background.png',
-            ), // Ganti sesuai path gambar
+            image: AssetImage('assets/background.png'),
             fit: BoxFit.cover,
           ),
         ),
@@ -36,14 +34,12 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 32),
 
-              // Username
               TextField(
                 controller: usernameController,
                 decoration: _inputDecoration('Username'),
               ),
               const SizedBox(height: 16),
 
-              // Password
               TextField(
                 controller: passwordController,
                 obscureText: true,
@@ -51,14 +47,13 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // Button Login
               Align(
                 alignment: Alignment.centerRight,
                 child: ElevatedButton(
                   onPressed: () {
                     print('Username: ${usernameController.text}');
                     print('Password: ${passwordController.text}');
-                    // TODO: Tambahkan aksi login
+                    Navigator.pushNamed(context, '/beranda');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey.shade700,
