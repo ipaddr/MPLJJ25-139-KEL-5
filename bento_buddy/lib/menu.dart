@@ -55,7 +55,7 @@ class Menu extends StatelessWidget {
                     'assets/belum_menerima.png',
                     'Belum Menerima Bantuan',
                   ),
-                  _buildMenuItem('assets/gathering.png', 'Gathering'),
+                  _buildMenuItem('assets/gathering.png', 'Cathering'),
                   _buildMenuItem('assets/ajukan.png', 'Ajukan Sekolah'),
                   _buildMenuItem('assets/laporan.png', 'Laporan'),
                   _buildMenuItem('assets/profil.png', 'Profil'),
@@ -108,25 +108,34 @@ class Menu extends StatelessWidget {
 
   Widget _buildMenuItem(String imagePath, String label) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.teal[200],
-            ),
-            padding: const EdgeInsets.all(12),
-            child: Image.asset(imagePath),
-          ),
-        ),
-        const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          width: 90,
+          height: 90,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.teal[200],
+          ),
+          padding: const EdgeInsets.all(12),
+          child: Image.asset(imagePath, fit: BoxFit.contain),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(20),
           ),
-          child: Text(label, textAlign: TextAlign.center),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+            textAlign: TextAlign.center,
+          ),
         ),
       ],
     );
