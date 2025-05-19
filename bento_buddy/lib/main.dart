@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'splash_screen.dart';
+import 'login_page.dart';
 import 'home_page.dart';
+import 'beranda.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Bento Buddy',
-      home: const HomePage(), // ✅ Cocok dengan nama class
+      home: const HomePage(),
     );
   }
 }
