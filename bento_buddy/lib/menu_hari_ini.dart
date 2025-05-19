@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class MenuHariIniPage extends StatelessWidget {
-  final List<Map<String, String>> menuList = [
+  const MenuHariIniPage({super.key});
+
+  final List<Map<String, String>> menuList = const [
     {
       "vendor": "Laper’in Cathering",
       "menu": "Nasi Uduk Ayam Bumbu",
@@ -39,23 +41,26 @@ class MenuHariIniPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80),
+        preferredSize: const Size.fromHeight(80),
         child: AppBar(
-          backgroundColor: Color(0xFF1F186F),
+          backgroundColor: const Color(0xFF1F186F),
           elevation: 0,
           flexibleSpace: Padding(
             padding: const EdgeInsets.only(top: 40, left: 16, right: 16),
             child: Row(
               children: [
                 Image.asset(
-                  'assets/logo.png', // ganti dengan logo kamu
+                  'assets/logo.png',
                   height: 36,
+                  errorBuilder:
+                      (context, error, stackTrace) =>
+                          const Icon(Icons.error, color: Colors.white),
                 ),
                 const SizedBox(width: 12),
-                Column(
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Text(
                       'Farastika Allistio',
                       style: TextStyle(color: Colors.white, fontSize: 16),
@@ -66,10 +71,10 @@ class MenuHariIniPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                Spacer(),
-                Icon(Icons.home_outlined, color: Colors.white),
-                SizedBox(width: 16),
-                Icon(Icons.menu, color: Colors.white),
+                const Spacer(),
+                const Icon(Icons.home_outlined, color: Colors.white),
+                const SizedBox(width: 16),
+                const Icon(Icons.menu, color: Colors.white),
               ],
             ),
           ),
@@ -80,7 +85,7 @@ class MenuHariIniPage extends StatelessWidget {
         child: Column(
           children: [
             Row(
-              children: [
+              children: const [
                 Icon(Icons.arrow_back),
                 SizedBox(width: 8),
                 Text(
@@ -93,9 +98,9 @@ class MenuHariIniPage extends StatelessWidget {
             TextField(
               decoration: InputDecoration(
                 hintText: 'Cari...',
-                prefixIcon: Icon(Icons.search),
-                suffixIcon: Icon(Icons.tune),
-                contentPadding: EdgeInsets.symmetric(
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: const Icon(Icons.tune),
+                contentPadding: const EdgeInsets.symmetric(
                   vertical: 0,
                   horizontal: 16,
                 ),
@@ -105,7 +110,7 @@ class MenuHariIniPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Align(
+            const Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'Hasil penelusuran untuk "Laper’in Cathering"',
