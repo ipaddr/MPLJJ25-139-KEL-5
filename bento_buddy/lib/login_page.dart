@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:bento_buddy/jasa_catering.dart';
+import 'package:flutter/material.dart'; // Pastikan import halaman tujuan
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -58,9 +59,25 @@ class LoginPage extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: ElevatedButton(
                     onPressed: () {
-                      debugPrint('Username: ${usernameController.text}');
-                      debugPrint('Password: ${passwordController.text}');
-                      // TODO: Tambahkan aksi login di sini
+                      final username = usernameController.text.trim();
+                      final password = passwordController.text;
+
+                      if (username.isNotEmpty && password.isNotEmpty) {
+                        // ✅ Navigasi ke halaman berikutnya
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const JasaCateringPage(),
+                          ),
+                        );
+                      } else {
+                        // ❌ Tampilkan pesan jika kosong
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Username dan password wajib diisi'),
+                          ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey.shade700,

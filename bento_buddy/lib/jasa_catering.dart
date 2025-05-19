@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'PemesananSekolahPage.dart'; // pastikan import file halaman tujuan
 
-class jasacatering extends StatelessWidget {
-  const jasacatering({super.key});
+class JasaCateringPage extends StatelessWidget {
+  const JasaCateringPage({super.key});
+
+  final List<String> jasaCateringList = const [
+    'Catering A',
+    'Catering B',
+    'Catering C',
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: Color(0xFF1B1464),
-        title: Row(
+        backgroundColor: const Color(0xFF1B1464),
+        title: const Row(
           children: [
             Icon(Icons.school),
             SizedBox(width: 10),
@@ -32,17 +39,19 @@ class jasacatering extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Jasa Catering",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            const Center(
+              child: Text(
+                "Jasa Catering",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.search),
+                      prefixIcon: const Icon(Icons.search),
                       hintText: "Cari jasa catering...",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
@@ -52,20 +61,36 @@ class jasacatering extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(width: 10),
-                Icon(Icons.filter_list),
+                const SizedBox(width: 10),
+                const Icon(Icons.filter_list),
               ],
             ),
-            SizedBox(height: 10),
-            Text(
+            const SizedBox(height: 10),
+            const Text(
               "Hasil pencarian untuk: 'Surakarta Barat'",
               style: TextStyle(fontSize: 12, color: Colors.blue),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Expanded(
               child: ListView.builder(
-                itemCount: 5,
-                itemBuilder: (context, index) => SchoolCard(),
+                itemCount: jasaCateringList.length,
+                itemBuilder: (context, index) {
+                  final namaCatering = jasaCateringList[index];
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => PemesananSekolahPage(
+                                namaCatering: namaCatering,
+                              ),
+                        ),
+                      );
+                    },
+                    child: CateringCard(namaCatering: namaCatering),
+                  );
+                },
               ),
             ),
           ],
@@ -75,29 +100,38 @@ class jasacatering extends StatelessWidget {
   }
 }
 
-class SchoolCard extends StatelessWidget {
-  const SchoolCard({super.key});
+class CateringCard extends StatelessWidget {
+  final String namaCatering;
+  const CateringCard({super.key, required this.namaCatering});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            Container(height: 40, width: 40, color: Colors.grey[300]),
-            SizedBox(width: 12),
+            Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.restaurant, color: Colors.white),
+            ),
+            const SizedBox(width: 12),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(height: 12, color: Colors.grey[300]),
-                  SizedBox(height: 6),
-                  Container(height: 12, width: 100, color: Colors.grey[300]),
-                ],
+              child: Text(
+                namaCatering,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ),
+            const Icon(Icons.arrow_forward_ios, size: 16),
           ],
         ),
       ),

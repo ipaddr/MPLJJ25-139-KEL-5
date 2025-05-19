@@ -1,31 +1,26 @@
-import 'dart:async';
+import 'package:bento_buddy/jasa_catering.dart';
+
+import 'package:bento_buddy/splash_screen.dart';
 import 'package:flutter/material.dart';
+// Pastikan kamu punya file ini
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
+void main() {
+  runApp(const BentoBuddy());
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Timer(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, '/HomePage'); // ← Arahkan ke home
-    });
-  }
+class BentoBuddy extends StatelessWidget {
+  const BentoBuddy({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text(
-          'Bento Buddy',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-      ),
+    return MaterialApp(
+      title: 'Bento Buddy',
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/login': (context) => const JasaCateringPage(),
+      },
     );
   }
 }
