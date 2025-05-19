@@ -1,5 +1,24 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'home_page.dart'; // pastikan file ini ada dan sesuai nama
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Bento Buddy',
+      theme: ThemeData(primarySwatch: Colors.indigo),
+      home: const SplashScreen(),
+    );
+  }
+}
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,7 +32,10 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, '/HomePage'); // ← Arahkan ke home
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
     });
   }
 
