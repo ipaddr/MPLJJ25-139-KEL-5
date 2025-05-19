@@ -1,3 +1,5 @@
+import 'package:bento_buddy/nerimabantuan.dart';
+import 'package:bento_buddy/pengajuanpage.dart';
 import 'package:flutter/material.dart';
 import 'splash_screen.dart';
 import 'login_page.dart';
@@ -16,7 +18,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Bento Buddy',
-      home: const HomePage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/login': (context) => const LoginPage(),
+        '/home': (context) => const HomePage(),
+        '/beranda': (context) => const NerimaBantuan(),
+        // Tambahkan rute lain jika ada
+        // '/pengajuan': (context) => const PengajuanPage(),
+      },
     );
   }
 }
