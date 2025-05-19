@@ -1,183 +1,183 @@
 import 'package:flutter/material.dart';
 
 class MenuHariIniPage extends StatelessWidget {
-  const MenuHariIniPage({super.key});
+  final List<Map<String, String>> menuList = [
+    {
+      "vendor": "Laper’in Cathering",
+      "menu": "Nasi Uduk Ayam Bumbu",
+      "desc":
+          "Nasi uduk kaya rempah dengan sepotong ayam bumbu dengan lalapan yang kaya gizi",
+    },
+    {
+      "vendor": "Anande Cathering",
+      "menu": "Ayam Balado",
+      "desc":
+          "Ayam kampung goreng balado, sayur kangkung,  dan tahu tempe goreng",
+    },
+    {
+      "vendor": "DeLuna Cathering",
+      "menu": "Sop Daging Rumput laut",
+      "desc":
+          "Sop dengan potongan daging sapi yang dimasak kuah kaldu ditambah rumput  laut yang menyegarkan dan sehat",
+    },
+    {
+      "vendor": "OndeMande Cathering",
+      "menu": "Ikan Bakar Sambal Matah",
+      "desc":
+          "Ikan laut yang dibakar dengan rempah khas minang dan dipadukan dengan sambal matah khas bali menghasilkan cita rasa yang mengunggah selera",
+    },
+    {
+      "vendor": "Golden Citty Cathering",
+      "menu": "Dadar Geprek Sambal kecap",
+      "desc":
+          "Telur dadar yang dimasak dengan tepung crispy dan digeprek dilengkapi sambal kecap dengan irisan cabe dan rempah lainnya",
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            const CustomHeader(),
-
-            const SizedBox(height: 16),
-            const Text(
-              'Menu Hari Ini',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 24),
-
-            // Form Area
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: Color(0xFF1F186F),
+          elevation: 0,
+          flexibleSpace: Padding(
+            padding: const EdgeInsets.only(top: 40, left: 16, right: 16),
+            child: Row(
+              children: [
+                Image.asset(
+                  'assets/logo.png', // ganti dengan logo kamu
+                  height: 36,
+                ),
+                const SizedBox(width: 12),
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Upload Gambar
-                    Container(
-                      width: double.infinity,
-                      height: 220,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade400,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Icon(
-                                Icons.image,
-                                size: 40,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade600,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Icon(
-                                Icons.camera_alt,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Text(
+                      'Farastika Allistio',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
-
-                    const SizedBox(height: 32),
-
-                    // Nama Menu
-                    const Text(
-                      'Nama Menu :',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.grey.shade300,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Deskripsi
-                    const Text(
-                      'Deskripsi :',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.grey.shade300,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    // Tombol Kirim
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // TODO: Kirim menu logic
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1E2378),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
-                            vertical: 14,
-                          ),
-                        ),
-                        child: const Text(
-                          'Kirim',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
+                    Text(
+                      'Laper’in Cathering',
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                   ],
                 ),
+                Spacer(),
+                Icon(Icons.home_outlined, color: Colors.white),
+                SizedBox(width: 16),
+                Icon(Icons.menu, color: Colors.white),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(Icons.arrow_back),
+                SizedBox(width: 8),
+                Text(
+                  "Menu Hari Ini",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Cari...',
+                prefixIcon: Icon(Icons.search),
+                suffixIcon: Icon(Icons.tune),
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 0,
+                  horizontal: 16,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Hasil penelusuran untuk "Laper’in Cathering"',
+                style: TextStyle(color: Colors.blue, fontSize: 12),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView.builder(
+                itemCount: menuList.length,
+                itemBuilder: (context, index) {
+                  final item = menuList[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item['vendor']!,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item['menu']!,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      item['desc']!,
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class CustomHeader extends StatelessWidget {
-  const CustomHeader({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
-        color: Color(0xFF1E2378),
-        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(40)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.book, color: Colors.white),
-          const SizedBox(width: 8),
-          const Text(
-            'Farastika Allistio\nLaper\'in Cathering',
-            style: TextStyle(color: Colors.white, fontSize: 12),
-          ),
-          const Spacer(),
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
       ),
     );
   }
