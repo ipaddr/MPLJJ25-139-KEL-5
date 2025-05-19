@@ -5,95 +5,67 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final usernameController = TextEditingController();
-    final passwordController = TextEditingController();
-
     return Scaffold(
       body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/background.png'),
             fit: BoxFit.cover,
           ),
         ),
-        child: Center(
-          child: Container(
-            width: 300,
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.85),
-              borderRadius: BorderRadius.circular(20),
-            ),
+        child: SafeArea(
+          child: Center(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  'LOGIN',
+                  'Selamat Datang!',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
+                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 24),
-
-                // Username
-                TextField(
-                  controller: usernameController,
-                  decoration: _inputDecoration('Username'),
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/login');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text('Login'),
                 ),
                 const SizedBox(height: 16),
-
-                // Password
-                TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: _inputDecoration('Password'),
-                ),
-                const SizedBox(height: 24),
-
-                // Tombol Login
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      debugPrint('Username: ${usernameController.text}');
-                      debugPrint('Password: ${passwordController.text}');
-                      // TODO: Tambahkan aksi login di sini
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade700,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/register');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
                     ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      child: Text('Login'),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
+                  child: const Text('Register'),
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  static InputDecoration _inputDecoration(String hintText) {
-    return InputDecoration(
-      hintText: hintText,
-      filled: true,
-      fillColor: Colors.grey.shade300,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
       ),
     );
   }
