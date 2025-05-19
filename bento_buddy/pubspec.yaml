@@ -22,4 +22,15 @@ flutter:
   uses-material-design: true
 
   assets:
-  - assets/
+  - assets/logo.png
+  - assets/background.png
+  - assets/school.png
+  - assets/location.png
+  - assets/bento.png
+  - assets/calendar.png
+  - assets/belum_menerima.png
+  - assets/menerima.png
+  - assets/Cathering.png
+  - assets/ajukan.png
+  - assets/laporan.png
+  - assets/profil.png
