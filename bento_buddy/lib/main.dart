@@ -1,32 +1,31 @@
-import 'package:bento_buddy/nerimabantuan.dart';
-import 'package:bento_buddy/pengajuanpage.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'splash_screen.dart';
-import 'login_page.dart';
-import 'home_page.dart';
-import 'beranda.dart';
 
-void main() {
-  runApp(const MyApp());
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Timer(const Duration(seconds: 2), () {
+      Navigator.pushReplacementNamed(context, '/HomePage'); // ← Arahkan ke home
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Bento Buddy',
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/login': (context) => const LoginPage(),
-        '/home': (context) => const HomePage(),
-        '/beranda': (context) => const NerimaBantuan(),
-        // Tambahkan rute lain jika ada
-        // '/pengajuan': (context) => const PengajuanPage(),
-      },
+    return const Scaffold(
+      body: Center(
+        child: Text(
+          'Bento Buddy',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+      ),
     );
   }
 }

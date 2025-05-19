@@ -55,7 +55,7 @@ class Menu extends StatelessWidget {
                     'assets/belum_menerima.png',
                     'Belum Menerima Bantuan',
                   ),
-                  _buildMenuItem('assets/gathering.png', 'Cathering'),
+                  _buildMenuItem('assets/cathering.png', 'Cathering'),
                   _buildMenuItem('assets/ajukan.png', 'Ajukan Sekolah'),
                   _buildMenuItem('assets/laporan.png', 'Laporan'),
                   _buildMenuItem('assets/profil.png', 'Profil'),
