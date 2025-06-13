@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+// Import halaman-halaman tujuan
+import 'nerimabantuan.dart';
+import 'blmnerimabantuan.dart';
+import 'jasa_catering.dart';
+import 'pengajuanpage.dart';
+import 'laporan.dart';
+import 'profil.dart';
 
 class Menu extends StatelessWidget {
   const Menu({super.key});
@@ -43,27 +50,52 @@ class Menu extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Menu Grid
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
                 crossAxisSpacing: 24,
                 mainAxisSpacing: 24,
                 children: [
-                  _buildMenuItem('assets/menerima.png', 'Menerima Bantuan'),
                   _buildMenuItem(
+                    context,
+                    'assets/menerima.png',
+                    'Menerima Bantuan',
+                    const DataSekolahPage(),
+                  ),
+                  _buildMenuItem(
+                    context,
                     'assets/belum_menerima.png',
                     'Belum Menerima Bantuan',
+                    const Blmnerimabantuan(),
                   ),
-                  _buildMenuItem('assets/cathering.png', 'Cathering'),
-                  _buildMenuItem('assets/ajukan.png', 'Ajukan Sekolah'),
-                  _buildMenuItem('assets/laporan.png', 'Laporan'),
-                  _buildMenuItem('assets/profil.png', 'Profil'),
+                  _buildMenuItem(
+                    context,
+                    'assets/cathering.png',
+                    'Cathering',
+                    const JasaCateringPage(),
+                  ),
+                  _buildMenuItem(
+                    context,
+                    'assets/ajukan.png',
+                    'Ajukan Sekolah',
+                    const PengajuanSekolahPage(),
+                  ),
+                  _buildMenuItem(
+                    context,
+                    'assets/laporan.png',
+                    'Laporan',
+                    const LaporanPage(),
+                  ),
+                  _buildMenuItem(
+                    context,
+                    'assets/profil.png',
+                    'Profil',
+                    const ProfilPage(),
+                  ),
                 ],
               ),
             ),
 
-            // Buttons at bottom
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -106,38 +138,51 @@ class Menu extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(String imagePath, String label) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          width: 90,
-          height: 90,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.teal[200],
-          ),
-          padding: const EdgeInsets.all(12),
-          child: Image.asset(imagePath, fit: BoxFit.contain),
-        ),
-        const SizedBox(height: 10),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
+  Widget _buildMenuItem(
+    BuildContext context,
+    String imagePath,
+    String label,
+    Widget destination,
+  ) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => destination),
+        );
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 90,
+            height: 90,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.teal[200],
             ),
-            textAlign: TextAlign.center,
+            padding: const EdgeInsets.all(12),
+            child: Image.asset(imagePath, fit: BoxFit.contain),
           ),
-        ),
-      ],
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

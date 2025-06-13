@@ -1,4 +1,4 @@
-import 'package:bento_buddy/jasa_catering.dart';
+import 'beranda.dart';
 
 import 'package:bento_buddy/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +19,7 @@ class BentoBuddy extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
-        '/login': (context) => const JasaCateringPage(),
+        '/login': (context) => const Beranda(),
       },
     );
   }

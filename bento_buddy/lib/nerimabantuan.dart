@@ -106,7 +106,7 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
                   return ListItemWidget(
                     nama: sekolah.nama,
                     alamat: sekolah.alamat,
-                    logoPath: '',
+                    logoPath: 'assets/${sekolah.logoPath}',
                   );
                 },
               ),
