@@ -3,9 +3,19 @@ import 'package:flutter/material.dart';
 class Sekolah {
   final String nama;
   final String alamat;
+  final String catering;
+  final String total;
+  final String tanggal;
   final String logoPath;
 
-  Sekolah({required this.nama, required this.alamat, required this.logoPath});
+  Sekolah({
+    required this.nama,
+    required this.alamat,
+    required this.catering,
+    required this.total,
+    required this.tanggal,
+    required this.logoPath,
+  });
 }
 
 class DataSekolahPage extends StatefulWidget {
@@ -27,26 +37,41 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
       Sekolah(
         nama: 'SDN 1 Surakarta Barat',
         alamat: 'Jl. Melati No.1',
+        catering: 'Laper\'in Catering',
+        total: '1.700 Porsi/hari',
+        tanggal: 'since 09 November 2024',
         logoPath: 'logosdn.png',
       ),
       Sekolah(
         nama: 'SMPN 2 Surakarta Barat',
         alamat: 'Jl. Kenanga No.5',
+        catering: 'Anande Catering',
+        total: '500 Porsi/hari',
+        tanggal: 'since 20 Maret 2024',
         logoPath: 'logosmp.png',
       ),
       Sekolah(
         nama: 'SMAN 3 Surakarta Barat',
         alamat: 'Jl. Mawar No.10',
+        catering: 'DeLuna Catering',
+        total: '760 Porsi/hari',
+        tanggal: 'since 05 Desember 2024',
         logoPath: 'logosma.png',
       ),
       Sekolah(
         nama: 'SDN 4 Surakarta Timur',
         alamat: 'Jl. Anggrek No.3',
+        catering: 'OndeMande Catering',
+        total: '287 Porsi/hari',
+        tanggal: 'since 12 Desember 2024',
         logoPath: 'logosdn.png',
       ),
       Sekolah(
         nama: 'SMPN 5 Surakarta Timur',
         alamat: 'Jl. Flamboyan No.7',
+        catering: 'Golden City Catering',
+        total: '456 Porsi/hari',
+        tanggal: 'since 17 April 2024',
         logoPath: 'logosmp.png',
       ),
     ];
@@ -106,6 +131,9 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
                   return ListItemWidget(
                     nama: sekolah.nama,
                     alamat: sekolah.alamat,
+                    catering: sekolah.catering,
+                    total: sekolah.total,
+                    tanggal: sekolah.tanggal,
                     logoPath: 'assets/${sekolah.logoPath}',
                   );
                 },
@@ -153,12 +181,18 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
 class ListItemWidget extends StatelessWidget {
   final String nama;
   final String alamat;
+  final String catering;
+  final String total;
+  final String tanggal;
   final String logoPath;
 
   const ListItemWidget({
     super.key,
     required this.nama,
     required this.alamat,
+    required this.catering,
+    required this.total,
+    required this.tanggal,
     required this.logoPath,
   });
 
@@ -191,6 +225,16 @@ class ListItemWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(alamat, style: const TextStyle(fontSize: 12)),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Catering: $catering',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  Text('Jumlah: $total', style: const TextStyle(fontSize: 12)),
+                  Text(
+                    tanggal,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
                 ],
               ),
             ),
