@@ -1,27 +1,89 @@
 import 'package:flutter/material.dart';
-import 'nerimabantuan.dart'; // Pastikan path ini benar
-import 'menu.dart'; // Import menu.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart'; // Untuk format tanggal
 
-void main() {
-  runApp(const MyApp());
-}
+// Definisi kelas Sekolah (Model)
+// Ini adalah definisi tunggal untuk model Sekolah
+class Sekolah {
+  final String id;
+  final String nama;
+  final String alamat;
+  final String? cateringName; // Nama catering yang terkait
+  final String totalPorsi; // Total porsi harian
+  final String tanggalKonfirmasi; // Tanggal konfirmasi/penerimaan sekolah
+  final String? logoPath; // Path logo sekolah
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  // Tambahan field untuk detail sekolah yang lebih spesifik
+  // Jika ini ada di Firestore, pastikan namanya sesuai.
+  // Jika tidak, Anda bisa menghapusnya atau menyediakan fallback.
+  final String? kepalaSekolah;
+  final String? kontakSekolah;
+  final String? emailSekolah;
+  final String?
+  totalDanaBantuan; // Misal dari field di Firestore 'totalFinancialAid'
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'School Details',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blue),
-      // Set home ke DataSekolahPage sebagai halaman awal
-      // Anda bisa mengubah ini ke Menu() jika Menu adalah halaman pertama
-      home: const DataSekolahPage(),
+  Sekolah({
+    required this.id,
+    required this.nama,
+    required this.alamat,
+    this.cateringName,
+    required this.totalPorsi,
+    required this.tanggalKonfirmasi,
+    this.logoPath,
+    this.kepalaSekolah,
+    this.kontakSekolah,
+    this.emailSekolah,
+    this.totalDanaBantuan,
+  });
+
+  // Factory constructor untuk membuat objek Sekolah dari DocumentSnapshot Firestore
+  factory Sekolah.fromFirestore(
+    DocumentSnapshot doc,
+    Map<String, String> cateringsMap,
+  ) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+    String? assignedCateringId = data['assignedCateringId'];
+    String? resolvedCateringName =
+        assignedCateringId != null ? cateringsMap[assignedCateringId] : null;
+
+    String formattedDate = 'Belum ada konfirmasi';
+    // Menggunakan 'confirmedDate' sebagai field tanggal konfirmasi
+    if (data['confirmedDate'] is Timestamp) {
+      DateTime dateTime = (data['confirmedDate'] as Timestamp).toDate();
+      formattedDate =
+          'dikonfirmasi sejak ${DateFormat('dd MMMM HH:mm').format(dateTime)}';
+    } else if (data['createdAt'] is Timestamp &&
+        (data['confirmedDate'] == null ||
+            !(data['confirmedDate'] is Timestamp))) {
+      // Fallback: Jika confirmedDate tidak ada, tapi createdAt ada, gunakan itu
+      DateTime dateTime = (data['createdAt'] as Timestamp).toDate();
+      formattedDate =
+          'dibuat pada ${DateFormat('dd MMMM HH:mm').format(dateTime)}';
+    }
+
+    return Sekolah(
+      id: doc.id,
+      nama: data['schoolName'] ?? 'Nama Sekolah Tidak Tersedia',
+      alamat: data['location'] ?? 'Alamat Tidak Tersedia',
+      cateringName: resolvedCateringName,
+      totalPorsi: '${data['totalAidReceived'] ?? 0} Porsi/hari',
+      tanggalKonfirmasi: formattedDate,
+      logoPath: data['logoPath'] ?? 'assets/school_building.png',
+
+      // Mengambil data tambahan (pastikan field ini ada di Firestore jika ingin dinamis)
+      kepalaSekolah: data['kepalaSekolah'] ?? 'Tidak Tersedia',
+      kontakSekolah: data['kontakSekolah'] ?? 'Tidak Tersedia',
+      emailSekolah: data['emailSekolah'] ?? 'Tidak Tersedia',
+      totalDanaBantuan:
+          data['totalDanaBantuan'] != null
+              ? 'Rp. ${NumberFormat("#,##0", "id_ID").format(data['totalDanaBantuan'])} / Bulan'
+              : 'Tidak Tersedia',
     );
   }
 }
 
+// Halaman Detail Sekolah
 class SekolahPage extends StatelessWidget {
   final Sekolah sekolahData;
 
@@ -32,8 +94,8 @@ class SekolahPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading:
-            false, // Menghilangkan tombol kembali default dari AppBar
+        // Menampilkan tombol kembali otomatis
+        automaticallyImplyLeading: true,
         toolbarHeight: 100,
         backgroundColor: const Color(0xFF271A5A),
         title: Row(
@@ -44,22 +106,29 @@ class SekolahPage extends StatelessWidget {
                 'assets/logo.png', // Logo utama aplikasi
                 height: 50,
                 width: 50,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.school,
+                    color: Colors.white,
+                    size: 50,
+                  ); // Fallback icon
+                },
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  'Farastika Allistio',
-                  style: TextStyle(
+                  sekolahData.nama, // Nama sekolah dari data dinamis
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  'Laper\'in Gathering',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
+                  sekolahData.alamat, // Alamat sekolah dari data dinamis
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ],
             ),
@@ -69,10 +138,8 @@ class SekolahPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.menu, color: Colors.white, size: 30),
             onPressed: () {
-              // Navigasi ke halaman Menu
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Menu()),
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Menu dari SekolahPage ditekan!')),
               );
             },
           ),
@@ -86,20 +153,8 @@ class SekolahPage extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(
-                        context,
-                      ); // Kembali ke halaman sebelumnya (DataSekolahPage)
-                    },
-                    child: const Icon(
-                      Icons.arrow_back_ios,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
                   Text(
-                    sekolahData.nama, // Nama sekolah dari data dinamis
+                    'Detail ${sekolahData.nama}', // Teks judul halaman
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -111,8 +166,8 @@ class SekolahPage extends StatelessWidget {
             ),
             Center(
               child: Image.asset(
-                sekolahData
-                    .logoPath, // Menggunakan logoPath dari objek sekolahData
+                sekolahData.logoPath ??
+                    'assets/school_building.png', // Menggunakan logoPath dari objek sekolahData
                 height: 200,
                 width: 300,
                 fit: BoxFit.contain,
@@ -139,18 +194,25 @@ class SekolahPage extends StatelessWidget {
                   _buildDetailRow('Nama Instansi', sekolahData.nama),
                   _buildDetailRow('Alamat', sekolahData.alamat),
                   _buildDetailRow(
+                    'Tanggal Konfirmasi',
+                    sekolahData.tanggalKonfirmasi,
+                  ), // Tanggal konfirmasi
+                  _buildDetailRow(
                     'Kepala Sekolah',
-                    'Farastika Allistio Putri',
-                  ), // Hardcoded
-                  _buildDetailRow('Kontak', '085378707219'), // Hardcoded
+                    sekolahData.kepalaSekolah ?? 'Tidak Tersedia',
+                  ),
+                  _buildDetailRow(
+                    'Kontak',
+                    sekolahData.kontakSekolah ?? 'Tidak Tersedia',
+                  ),
                   _buildDetailRow(
                     'Email',
-                    'sdn01padang@gmail.com',
-                  ), // Hardcoded
+                    sekolahData.emailSekolah ?? 'Tidak Tersedia',
+                  ),
                   _buildDetailRow(
                     'Total Dana',
-                    'Rp. 200.000.000 / Bulan',
-                  ), // Hardcoded
+                    sekolahData.totalDanaBantuan ?? 'Tidak Tersedia',
+                  ),
                 ],
               ),
             ),
@@ -194,23 +256,31 @@ class SekolahPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 15),
-            _buildCateringCard(
-              context,
-              'assets/laper.png', // Logo Laper'in Catering
-              sekolahData.catering,
-              sekolahData.alamat,
-              sekolahData.total,
-              sekolahData.tanggal,
-            ),
-            const SizedBox(height: 15),
-            _buildCateringCard(
-              context,
-              'assets/ondemande.png', // Logo OndeMande Catering
-              'OndeMande Catering',
-              'Jl. Parkit No. 8 Padang', // Hardcoded
-              '1.768 porsi/hari',
-              '09 November 2024',
-            ),
+            // Tampilkan hanya satu Catering Card yang terkait dengan sekolah ini
+            if (sekolahData.cateringName != null)
+              _buildCateringCard(
+                context,
+                sekolahData.logoPath ??
+                    'assets/school_building.png', // Gunakan logo sekolah atau fallback untuk catering card
+                sekolahData.cateringName!, // Nama catering dari data dinamis
+                sekolahData
+                    .alamat, // Alamat sekolah untuk catering (jika tidak ada alamat spesifik catering)
+                sekolahData.totalPorsi, // Total porsi dari data dinamis
+                sekolahData
+                    .tanggalKonfirmasi, // Tanggal konfirmasi dari data dinamis
+              )
+            else
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Catering belum ditugaskan untuk sekolah ini.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
             const SizedBox(height: 20),
           ],
         ),
@@ -293,7 +363,7 @@ class SekolahPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Image.asset(
-              logoAsset,
+              logoAsset, // Menggunakan logo sekolah atau logo catering jika ada field terpisah
               height: 60,
               width: 60,
               fit: BoxFit.contain,

@@ -1,3 +1,4 @@
+import 'package:bento_buddy/home_page.dart';
 import 'package:flutter/material.dart';
 import 'notif_ajukan.dart'; // Import halaman notifikasi pengajuan
 import 'beranda.dart'; // Asumsi Beranda ada untuk navigasi kembali dari header
@@ -125,7 +126,7 @@ class CustomHeader extends StatelessWidget {
               // Contoh navigasi ke Beranda dari header
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const Beranda()),
+                MaterialPageRoute(builder: (context) => const HomePage()),
               );
             },
           ),

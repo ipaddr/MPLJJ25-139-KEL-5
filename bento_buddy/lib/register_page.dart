@@ -1,3 +1,4 @@
+import 'package:bento_buddy/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'notif_register.dart'; // Import NotifRegisterPage untuk navigasi setelah register
 import 'login_page.dart'; // Import LoginPage untuk navigasi kembali ke halaman login
@@ -11,7 +12,8 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   String? selectedStatus;
-  bool _obscureText = true; // State untuk mengontrol visibilitas password
+  bool _obscureText = true;
+  final AuthService _authService = AuthService(); // Instance dari AuthService
 
   final List<String> statuses = [
     'Admin Sekolah',
@@ -22,22 +24,24 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // Controllers untuk setiap TextFormField
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController idController = TextEditingController();
+  final TextEditingController nikController =
+      TextEditingController(); // Mengganti idController menjadi nikController
   final TextEditingController institutionNameController =
       TextEditingController();
   final TextEditingController institutionAddressController =
       TextEditingController();
-  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController =
+      TextEditingController(); // Mengganti usernameController menjadi emailController
   final TextEditingController passwordController = TextEditingController();
 
   // Pastikan untuk membuang controller saat widget dihapus untuk mencegah memory leaks
   @override
   void dispose() {
     nameController.dispose();
-    idController.dispose();
+    nikController.dispose(); // Dispose nikController
     institutionNameController.dispose();
     institutionAddressController.dispose();
-    usernameController.dispose();
+    emailController.dispose(); // Dispose emailController
     passwordController.dispose();
     super.dispose();
   }
@@ -49,100 +53,104 @@ class _RegisterPageState extends State<RegisterPage> {
     Widget? suffixIcon,
   }) {
     return InputDecoration(
-      hintText: hintText, // Teks placeholder
-      filled: true, // Mengisi latar belakang TextField
-      fillColor: Colors.grey.shade200, // Warna latar belakang TextField
+      hintText: hintText, // Placeholder text
+      filled: true, // Fills the background of the TextField
+      fillColor: Colors.grey.shade200, // Background color of the TextField
       contentPadding: const EdgeInsets.symmetric(
         horizontal: 16,
         vertical: 14,
-      ), // Padding konten
+      ), // Content padding
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12), // Sudut membulat pada border
-        borderSide: BorderSide.none, // Menghilangkan garis border
+        borderRadius: BorderRadius.circular(
+          12,
+        ), // Rounded corners for the border
+        borderSide: BorderSide.none, // Removes the border line
       ),
       prefixIcon:
           prefixIcon != null
               ? Icon(prefixIcon, color: Colors.grey)
-              : null, // Ikon di awal input
+              : null, // Icon at the start of the input
       suffixIcon:
-          suffixIcon, // Ikon di akhir input (digunakan untuk toggle password)
-      hintStyle: const TextStyle(color: Colors.grey), // Gaya untuk teks hint
+          suffixIcon, // Icon at the end of the input (used for password toggle)
+      hintStyle: const TextStyle(color: Colors.grey), // Style for hint text
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Mengatur latar belakang halaman dengan gambar
+      // Set the page background with an image
       body: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: 24,
-        ), // Padding horizontal untuk konten
+        ), // Horizontal padding for content
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/background.png'), // Pastikan aset ini ada
-            fit: BoxFit.cover, // Gambar menutupi seluruh area
+            image: AssetImage(
+              'assets/background.png',
+            ), // Ensure this asset exists
+            fit: BoxFit.cover, // Image covers the entire area
           ),
         ),
         child: SafeArea(
-          // Memastikan konten tidak tumpang tindih dengan status bar atau notch
+          // Ensures content does not overlap with the status bar or notch
           child: SingleChildScrollView(
-            // Memungkinkan halaman untuk discroll jika konten melebihi tinggi layar
+            // Allows the page to be scrolled if content exceeds screen height
             child: Column(
               children: [
-                const SizedBox(height: 40), // Spasi di bagian atas
-                // Tombol kembali (Ikon panah kiri) - Sudah ada dan berfungsi
+                const SizedBox(height: 40), // Space at the top
+                // Back button (left arrow icon) - Already exists and works
                 Align(
-                  alignment: Alignment.centerLeft, // Pusatkan ikon ke kiri
+                  alignment: Alignment.centerLeft, // Align icon to the left
                   child: GestureDetector(
                     onTap: () {
-                      // Navigasi kembali ke LoginPage.
-                      // pushAndRemoveUntil digunakan untuk menghapus semua rute sebelumnya
-                      // sehingga pengguna tidak bisa kembali ke register_page setelah login.
+                      // Navigate back to LoginPage.
+                      // pushAndRemoveUntil is used to remove all previous routes
+                      // so the user cannot go back to register_page after login.
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(
                           builder: (context) => const LoginPage(),
                         ),
                         (Route<dynamic> route) =>
-                            false, // Hapus semua rute dari stack
+                            false, // Remove all routes from the stack
                       );
                     },
                     child: const Icon(
-                      Icons.arrow_back_ios, // Ikon panah kiri
+                      Icons.arrow_back_ios, // Left arrow icon
                       color:
                           Colors
-                              .white, // Warna ikon agar terlihat di latar belakang
-                      size: 28, // Ukuran ikon
+                              .white, // Icon color to be visible on the background
+                      size: 28, // Icon size
                     ),
                   ),
                 ),
-                const SizedBox(height: 20), // Spasi setelah tombol kembali
-                // Judul Halaman "REGISTER"
+                const SizedBox(height: 20), // Space after back button
+                // Page title "REGISTER"
                 const Align(
-                  alignment: Alignment.centerLeft, // Pusatkan teks ke kiri
+                  alignment: Alignment.centerLeft, // Align text to the left
                   child: Text(
                     'REGISTER',
                     style: TextStyle(
-                      fontSize: 28, // Ukuran font
-                      fontWeight: FontWeight.bold, // Gaya teks bold
-                      decoration: TextDecoration.underline, // Garis bawah
+                      fontSize: 28, // Font size
+                      fontWeight: FontWeight.bold, // Bold text style
+                      decoration: TextDecoration.underline, // Underline
                       color: Color.fromARGB(
                         255,
                         16,
                         4,
                         68,
-                      ), // Warna teks (biru tua, kontras dengan putih)
+                      ), // Text color (dark blue, contrasting with white)
                     ),
                   ),
                 ),
-                const SizedBox(height: 20), // Spasi setelah judul
+                const SizedBox(height: 20), // Space after title
                 // Input Field: Status (Dropdown)
                 DropdownButtonFormField<String>(
-                  value: selectedStatus, // Nilai yang dipilih
+                  value: selectedStatus, // Selected value
                   hint: const Text(
                     'Status',
                     style: TextStyle(color: Colors.grey),
-                  ), // Teks hint
+                  ), // Hint text
                   items:
                       statuses.map((status) {
                         return DropdownMenuItem(
@@ -152,20 +160,18 @@ class _RegisterPageState extends State<RegisterPage> {
                       }).toList(),
                   onChanged: (value) {
                     setState(() {
-                      selectedStatus =
-                          value; // Perbarui state saat nilai berubah
+                      selectedStatus = value; // Update state when value changes
                     });
                   },
                   decoration: _inputDecoration(
                     prefixIcon: Icons.person_outline,
-                  ), // Menggunakan helper Decoration
+                  ), // Use helper Decoration
                 ),
                 const SizedBox(height: 12),
 
                 // Input Field: Nama Lengkap
                 TextFormField(
-                  controller:
-                      nameController, // Controller untuk mengambil input
+                  controller: nameController, // Controller to get input
                   decoration: _inputDecoration(
                     hintText: 'Nama Lengkap',
                     prefixIcon: Icons.person_outline,
@@ -173,19 +179,20 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 12),
 
-                // Input Field: Nomor Identitas
+                // Input Field: Nomor Induk Kependudukan (NIK)
                 TextFormField(
-                  controller: idController,
+                  controller: nikController, // Use nikController
                   decoration: _inputDecoration(
-                    hintText: 'Nomor Identitas',
+                    hintText:
+                        'Nomor Induk Kependudukan (NIK)', // Hint text changed
                     prefixIcon: Icons.credit_card,
                   ),
                   keyboardType:
-                      TextInputType.number, // Mengatur keyboard hanya angka
+                      TextInputType.number, // Set keyboard to numbers only
                 ),
                 const SizedBox(height: 12),
 
-                // Input Field: Nama Instansi (Hanya tampil jika status bukan 'Umum')
+                // Input Field: Nama Instansi (Only visible if status is not 'Umum')
                 if (selectedStatus != 'Umum' && selectedStatus != null)
                   Column(
                     children: [
@@ -200,7 +207,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ],
                   ),
 
-                // Input Field: Alamat Instansi (Hanya tampil jika status bukan 'Umum')
+                // Input Field: Alamat Instansi (Only visible if status is not 'Umum')
                 if (selectedStatus != 'Umum' && selectedStatus != null)
                   Column(
                     children: [
@@ -215,13 +222,15 @@ class _RegisterPageState extends State<RegisterPage> {
                     ],
                   ),
 
-                // Input Field: Username
+                // Input Field: Email
                 TextFormField(
-                  controller: usernameController,
+                  controller: emailController, // Use emailController
                   decoration: _inputDecoration(
-                    hintText: 'Username',
-                    prefixIcon: Icons.account_circle_outlined,
+                    hintText: 'Email', // Hint text changed
+                    prefixIcon: Icons.email_outlined, // Icon changed
                   ),
+                  keyboardType:
+                      TextInputType.emailAddress, // Set keyboard for email
                 ),
                 const SizedBox(height: 12),
 
@@ -229,7 +238,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 TextFormField(
                   controller: passwordController,
                   obscureText:
-                      _obscureText, // Menggunakan state untuk visibilitas password
+                      _obscureText, // Use state for password visibility
                   decoration: _inputDecoration(
                     hintText: 'Password',
                     prefixIcon: Icons.lock_outline,
@@ -238,13 +247,13 @@ class _RegisterPageState extends State<RegisterPage> {
                         _obscureText
                             ? Icons.visibility_off
                             : Icons
-                                .visibility, // Ikon berubah (mata tertutup/terbuka)
+                                .visibility, // Icon changes (eye closed/open)
                         color: Colors.grey,
                       ),
                       onPressed: () {
                         setState(() {
                           _obscureText =
-                              !_obscureText; // Toggle visibilitas password
+                              !_obscureText; // Toggle password visibility
                         });
                       },
                     ),
@@ -252,34 +261,102 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 20),
 
-                // Tombol Register
+                // Register Button
                 Align(
-                  alignment: Alignment.centerRight, // Pusatkan tombol ke kanan
+                  alignment: Alignment.centerRight, // Align button to the right
                   child: ElevatedButton(
-                    onPressed: () {
-                      // TODO: Tambahkan logika registrasi yang sebenarnya di sini.
-                      // Misalnya, validasi input, panggil API pendaftaran, dll.
+                    onPressed: () async {
+                      // Make onPressed async
+                      // Basic input validation
+                      if (selectedStatus == null ||
+                          nameController.text.isEmpty ||
+                          nikController.text.isEmpty ||
+                          emailController.text.isEmpty ||
+                          passwordController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Semua field wajib diisi!'),
+                          ),
+                        );
+                        return;
+                      }
 
-                      // Setelah proses registrasi (dummy) berhasil:
-                      // Navigasi ke NotifRegisterPage dan hapus semua rute sebelumnya
-                      // agar pengguna tidak bisa kembali ke halaman register dari notifikasi.
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const NotifRegisterPage(),
-                        ),
-                        (Route<dynamic> route) => false,
+                      // Additional validation for institution if not 'Umum'
+                      if (selectedStatus != 'Umum' &&
+                          (institutionNameController.text.isEmpty ||
+                              institutionAddressController.text.isEmpty)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Nama dan Alamat Instansi wajib diisi!',
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+
+                      // Show loading spinner
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder:
+                            (context) => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
                       );
+
+                      // Call the register function from AuthService
+                      String?
+                      errorMessage = await _authService.registerWithEmailPassword(
+                        email: emailController.text.trim(),
+                        password: passwordController.text.trim(),
+                        fullName: nameController.text.trim(),
+                        nik: nikController.text.trim(),
+                        role:
+                            selectedStatus!, // selectedStatus cannot be null due to validation above
+                        institutionName:
+                            selectedStatus != 'Umum'
+                                ? institutionNameController.text.trim()
+                                : null,
+                        institutionAddress:
+                            selectedStatus != 'Umum'
+                                ? institutionAddressController.text.trim()
+                                : null,
+                      );
+
+                      // Hide loading spinner
+                      Navigator.of(context).pop();
+
+                      if (errorMessage == null) {
+                        // Registration successful
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Registrasi berhasil!')),
+                        );
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NotifRegisterPage(),
+                          ),
+                          (Route<dynamic> route) => false,
+                        );
+                      } else {
+                        // Registration failed, show error message
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Gagal registrasi: $errorMessage'),
+                          ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(
                         0xFF1E2378,
-                      ), // Warna latar belakang tombol
-                      foregroundColor: Colors.white, // Warna teks tombol
+                      ), // Button background color
+                      foregroundColor: Colors.white, // Button text color
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
                           10,
-                        ), // Sudut membulat tombol
+                        ), // Rounded corners for the button
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
@@ -289,10 +366,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: const Text(
                       'Register',
                       style: TextStyle(fontSize: 16),
-                    ), // Teks tombol
+                    ), // Button text
                   ),
                 ),
-                const SizedBox(height: 40), // Spasi di bagian bawah
+                const SizedBox(height: 40), // Space at the bottom
               ],
             ),
           ),

@@ -1,24 +1,29 @@
 import 'package:flutter/material.dart';
-import 'sekolah.dart'; // Import file sekolah.dart
-import 'menu.dart'; // Import menu.dart
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Cloud Firestore
+import 'package:intl/intl.dart'; // Import untuk format tanggal
+import 'package:bento_buddy/sekolah.dart'; // Import file sekolah.dart (yang berisi model Sekolah dan SekolahPage)
+import 'package:bento_buddy/menu.dart'; // Import menu.dart (pastikan path ini benar)
 
-class Sekolah {
-  final String nama;
-  final String alamat;
-  final String catering;
-  final String total;
-  final String tanggal;
-  final String logoPath;
+// HAPUS SEPENUHNYA DEFINISI KELAS SEKOLAH DARI SINI.
+// Definisi kelas Sekolah sudah dipindahkan ke `sekolah.dart`.
+// class Sekolah {
+//   final String nama;
+//   final String alamat;
+//   final String catering;
+//   final String total;
+//   final String tanggal;
+//   final String logoPath;
 
-  Sekolah({
-    required this.nama,
-    required this.alamat,
-    required this.catering,
-    required this.total,
-    required this.tanggal,
-    required this.logoPath,
-  });
-}
+//   Sekolah({
+//     required this.nama,
+//     required this.alamat,
+//     required this.catering,
+//     required this.total,
+//     required this.tanggal,
+//     required this.logoPath,
+//   });
+// }
 
 class DataSekolahPage extends StatefulWidget {
   const DataSekolahPage({super.key});
@@ -29,70 +34,79 @@ class DataSekolahPage extends StatefulWidget {
 
 class _DataSekolahPageState extends State<DataSekolahPage> {
   final TextEditingController _searchController = TextEditingController();
-  List<Sekolah> semuaSekolah = [];
-  List<Sekolah> hasilPencarian = [];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  List<Sekolah> _allSchoolsData = []; // Data sekolah dari Firestore
+  List<Sekolah> _filteredSchoolsData = []; // Hasil pencarian
+  Map<String, String> _cateringsMap = {}; // Map: cateringId -> cateringName
 
   @override
   void initState() {
     super.initState();
-    semuaSekolah = [
-      Sekolah(
-        nama: 'SDN 01 Padang',
-        alamat: 'Jl. Parkit No. 8 Padang',
-        catering: 'Laper\'in Catering',
-        total: '1.700 Porsi/hari',
-        tanggal: 'since 09 November 2024',
-        logoPath: 'assets/logosdn.png', // Pastikan path ini benar
-      ),
-      Sekolah(
-        nama: 'SMPN 2 Padang Barat',
-        alamat: 'Jl. Kenanga No.5',
-        catering: 'Anande Catering',
-        total: '500 Porsi/hari',
-        tanggal: 'since 20 Maret 2024',
-        logoPath: 'assets/logosmp.png', // Pastikan path ini benar
-      ),
-      Sekolah(
-        nama: 'SMAN 3 Padang Selatan',
-        alamat: 'Jl. Mawar No.10',
-        catering: 'DeLuna Catering',
-        total: '760 Porsi/hari',
-        tanggal: 'since 05 Desember 2024',
-        logoPath: 'assets/logosma.png', // Pastikan path ini benar
-      ),
-      Sekolah(
-        nama: 'SDN 4 Padang Timur',
-        alamat: 'Jl. Anggrek No.3',
-        catering: 'OndeMande Catering',
-        total: '287 Porsi/hari',
-        tanggal: 'since 12 Desember 2024',
-        logoPath: 'assets/logosdn.png', // Pastikan path ini benar
-      ),
-      Sekolah(
-        nama: 'SMPN 5 Padang Utara',
-        alamat: 'Jl. Flamboyan No.7',
-        catering: 'Golden City Catering',
-        total: '456 Porsi/hari',
-        tanggal: 'since 17 April 2024',
-        logoPath: 'assets/logosmp.png', // Pastikan path ini benar
-      ),
-    ];
-    hasilPencarian = semuaSekolah;
+    _loadInitialData(); // Muat data dari Firebase
     _searchController.addListener(_filterSekolah);
+  }
+
+  // Fungsi untuk memuat data sekolah dari Firestore
+  Future<void> _loadInitialData() async {
+    // Muat semua data katering terlebih dahulu untuk resolusi nama
+    QuerySnapshot cateringSnapshot =
+        await _firestore.collection('caterings').get();
+    for (var doc in cateringSnapshot.docs) {
+      _cateringsMap[doc.id] =
+          doc['cateringName'] ?? 'Nama Catering Tidak Ditemukan';
+    }
+
+    // Mendengarkan perubahan pada koleksi 'schools'
+    // Filter untuk sekolah yang SUDAH menerima bantuan (isApproved: true)
+    _firestore
+        .collection('schools')
+        .where(
+          'isApproved',
+          isEqualTo: true,
+        ) // Ini adalah asumsi untuk "sekolah yang telah menerima bantuan"
+        .snapshots()
+        .listen(
+          (snapshot) {
+            List<Sekolah> loadedSchools =
+                snapshot.docs
+                    .map((doc) => Sekolah.fromFirestore(doc, _cateringsMap))
+                    .toList();
+            setState(() {
+              _allSchoolsData = loadedSchools;
+              _filterSekolah(); // Terapkan filter setelah data dimuat/diperbarui
+            });
+          },
+          onError: (error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error loading schools: $error')),
+            );
+          },
+        );
   }
 
   void _filterSekolah() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      hasilPencarian =
-          semuaSekolah
-              .where((s) => s.nama.toLowerCase().contains(query))
-              .toList();
+      if (query.isEmpty) {
+        _filteredSchoolsData = _allSchoolsData;
+      } else {
+        _filteredSchoolsData =
+            _allSchoolsData
+                .where(
+                  (s) =>
+                      s.nama.toLowerCase().contains(query) ||
+                      s.alamat.toLowerCase().contains(query) ||
+                      (s.cateringName?.toLowerCase().contains(query) ?? false),
+                )
+                .toList();
+      }
     });
   }
 
   @override
   void dispose() {
+    _searchController.removeListener(_filterSekolah);
     _searchController.dispose();
     super.dispose();
   }
@@ -103,8 +117,8 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Meneruskan Navigator ke CustomHeader agar bisa mengakses Navigator.push
             CustomHeader(
+              // CustomHeader dari file ini
               onMenuPressed: () {
                 Navigator.push(
                   context,
@@ -130,35 +144,43 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
                   'Hasil pencarian untuk "${_searchController.text}"',
                   style: const TextStyle(fontSize: 12, color: Colors.blue),
                 ),
+              )
+            else
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  "Berikut adalah daftar sekolah yang telah menerima bantuan:", // Pesan default yang lebih sesuai
+                  style: TextStyle(fontSize: 12, color: Colors.blue),
+                ),
               ),
             const SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: hasilPencarian.length,
-                itemBuilder: (context, index) {
-                  final sekolah = hasilPencarian[index];
-                  return ListItemWidget(
-                    nama: sekolah.nama,
-                    alamat: sekolah.alamat,
-                    catering: sekolah.catering,
-                    total: sekolah.total,
-                    tanggal: sekolah.tanggal,
-                    logoPath:
-                        sekolah
-                            .logoPath, // Meneruskan logoPath dari model Sekolah
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) => SekolahPage(sekolahData: sekolah),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+              child:
+                  _allSchoolsData.isEmpty && _filteredSchoolsData.isEmpty
+                      ? const Center(
+                        child: CircularProgressIndicator(),
+                      ) // Tampilkan loading
+                      : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: _filteredSchoolsData.length,
+                        itemBuilder: (context, index) {
+                          final sekolah = _filteredSchoolsData[index];
+                          return ListItemWidget(
+                            // Menggunakan ListItemWidget yang dimodifikasi
+                            sekolah: sekolah, // Meneruskan objek Sekolah
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) =>
+                                          SekolahPage(sekolahData: sekolah),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
             ),
           ],
         ),
@@ -168,7 +190,9 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
 
   Widget _buildSearchBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(
+        horizontal: 16,
+      ), // Memberi margin agar sesuai dengan padding halaman
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.grey.shade300,
@@ -191,6 +215,9 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
             icon: const Icon(Icons.filter_alt_outlined),
             onPressed: () {
               // Tambahkan filter jika diperlukan
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Filter icon pressed!')),
+              );
             },
           ),
         ],
@@ -199,23 +226,15 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
   }
 }
 
+// Modifikasi ListItemWidget untuk menerima objek Sekolah
+// Sekarang mengambil data dari model Sekolah yang terpusat di `sekolah.dart`
 class ListItemWidget extends StatelessWidget {
-  final String nama;
-  final String alamat;
-  final String catering;
-  final String total;
-  final String tanggal;
-  final String logoPath;
+  final Sekolah sekolah; // Mengambil objek Sekolah langsung
   final VoidCallback onTap;
 
   const ListItemWidget({
     super.key,
-    required this.nama,
-    required this.alamat,
-    required this.catering,
-    required this.total,
-    required this.tanggal,
-    required this.logoPath,
+    required this.sekolah, // Diperlukan objek Sekolah
     required this.onTap,
   });
 
@@ -233,15 +252,18 @@ class ListItemWidget extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.asset(
-                  logoPath,
+                  sekolah.logoPath ??
+                      'assets/school_building.png', // Gunakan logoPath dari objek sekolah
                   width: 50,
                   height: 50,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
-                    return const Icon(
-                      Icons.broken_image,
-                      size: 50,
-                      color: Colors.grey,
+                    return Image.asset(
+                      // Fallback image asset
+                      'assets/school_building.png',
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
                     );
                   },
                 ),
@@ -252,22 +274,27 @@ class ListItemWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      nama,
+                      sekolah.nama, // Ambil dari objek
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    Text(alamat, style: const TextStyle(fontSize: 12)),
+                    Text(
+                      sekolah.alamat,
+                      style: const TextStyle(fontSize: 12),
+                    ), // Ambil dari objek
                     const SizedBox(height: 4),
+                    if (sekolah.cateringName != null &&
+                        sekolah.cateringName!.isNotEmpty)
+                      Text(
+                        'Catering: ${sekolah.cateringName}', // Ambil dari objek
+                        style: const TextStyle(fontSize: 12),
+                      ),
                     Text(
-                      'Catering: $catering',
+                      'Jumlah: ${sekolah.totalPorsi}', // Ambil dari objek
                       style: const TextStyle(fontSize: 12),
                     ),
                     Text(
-                      'Jumlah: $total',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    Text(
-                      tanggal,
+                      sekolah.tanggalKonfirmasi, // Ambil dari objek
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                   ],
@@ -281,8 +308,11 @@ class ListItemWidget extends StatelessWidget {
   }
 }
 
-class CustomHeader extends StatelessWidget {
-  final VoidCallback onMenuPressed; // Tambahkan properti VoidCallback
+// CustomHeader yang Anda sediakan di nerimabantuan.dart
+// Ini adalah versi yang berbeda dengan di home_page.dart (tidak dinamis dari Firebase)
+class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
+  // Implementasi PreferredSizeWidget
+  final VoidCallback onMenuPressed;
 
   const CustomHeader({super.key, required this.onMenuPressed});
 
@@ -294,21 +324,27 @@ class CustomHeader extends StatelessWidget {
         color: Color(0xFF1E2378),
         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(40)),
       ),
-      child: Row(
-        children: [
-          Image.asset('assets/logo.png', width: 24, height: 24),
-          const SizedBox(width: 8),
-          const Text(
-            'Farastika Allistio\nLaper\'in Catering',
-            style: TextStyle(color: Colors.white, fontSize: 12),
-          ),
-          const Spacer(),
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: onMenuPressed, // Panggil callback saat ikon ditekan
-          ),
-        ],
+      child: SafeArea(
+        // Tambahkan SafeArea untuk menghindari tumpang tindih dengan status bar
+        child: Row(
+          children: [
+            Image.asset('assets/logo.png', width: 24, height: 24),
+            const SizedBox(width: 8),
+            const Text(
+              'Farastika Allistio\nLaper\'in Catering', // Teks ini masih hardcoded
+              style: TextStyle(color: Colors.white, fontSize: 12),
+            ),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: onMenuPressed,
+            ),
+          ],
+        ),
       ),
     );
   }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(100.0); // Implementasi ukuran AppBar
 }

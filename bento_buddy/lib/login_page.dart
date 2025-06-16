@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'beranda.dart'; // Import Beranda, karena setelah login akan diarahkan ke sana
+import 'package:bento_buddy/home_page.dart'; // Import HomePage yang baru
 import 'register_page.dart'; // Import RegisterPage
+import 'package:bento_buddy/services/auth_service.dart'; // Import AuthService
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,19 +11,22 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController usernameController = TextEditingController();
+  // Mengganti usernameController menjadi emailController agar sesuai dengan Firebase Auth
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  final AuthService _authService = AuthService(); // Instance dari AuthService
 
   // Pastikan untuk membuang controller saat widget dihapus
   @override
   void dispose() {
-    usernameController.dispose();
+    emailController.dispose(); // Dispose emailController
     passwordController.dispose();
     super.dispose();
   }
 
   // Helper method untuk konsistensi gaya InputDecoration
-  InputDecoration _inputDecoration(String hintText) {
+  InputDecoration _inputDecoration(String hintText, {IconData? prefixIcon}) {
     return InputDecoration(
       hintText: hintText,
       filled: true,
@@ -32,6 +36,10 @@ class _LoginPageState extends State<LoginPage> {
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
       ),
+      prefixIcon:
+          prefixIcon != null
+              ? Icon(prefixIcon, color: Colors.grey)
+              : null, // Tambahkan prefixIcon
       hintStyle: const TextStyle(color: Colors.grey), // Gaya untuk hint text
     );
   }
@@ -54,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(
                 0.85,
-              ), // Fix: Menggunakan .withOpacity()
+              ), // Menggunakan .withOpacity()
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -76,10 +84,15 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 24),
 
-                // Username TextField
+                // Email TextField
                 TextField(
-                  controller: usernameController,
-                  decoration: _inputDecoration('Username'),
+                  controller: emailController, // Gunakan emailController
+                  keyboardType:
+                      TextInputType.emailAddress, // Keyboard untuk email
+                  decoration: _inputDecoration(
+                    'Email',
+                    prefixIcon: Icons.email_outlined,
+                  ), // Tambahkan ikon email
                 ),
                 const SizedBox(height: 16),
 
@@ -87,7 +100,10 @@ class _LoginPageState extends State<LoginPage> {
                 TextField(
                   controller: passwordController,
                   obscureText: true,
-                  decoration: _inputDecoration('Password'),
+                  decoration: _inputDecoration(
+                    'Password',
+                    prefixIcon: Icons.lock_outline,
+                  ), // Tambahkan ikon kunci
                 ),
                 const SizedBox(height: 24),
 
@@ -95,26 +111,58 @@ class _LoginPageState extends State<LoginPage> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton(
-                    onPressed: () {
-                      final username = usernameController.text.trim();
+                    onPressed: () async {
+                      // Ubah menjadi async
+                      final email = emailController.text.trim();
                       final password = passwordController.text;
 
-                      if (username.isNotEmpty && password.isNotEmpty) {
-                        // ✅ Navigasi ke halaman Beranda
+                      if (email.isEmpty || password.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Email dan password wajib diisi'),
+                          ),
+                        );
+                        return;
+                      }
+
+                      // Tampilkan loading spinner
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder:
+                            (context) => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                      );
+
+                      // Panggil fungsi signIn dari AuthService
+                      String? errorMessage = await _authService
+                          .signInWithEmailPassword(
+                            email: email,
+                            password: password,
+                          );
+
+                      // Sembunyikan loading spinner
+                      Navigator.of(context).pop();
+
+                      if (errorMessage == null) {
+                        // Login berhasil
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Login berhasil!')),
+                        );
+                        // Navigasi ke halaman HomePage yang baru dan hapus stack navigasi sebelumnya
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             builder:
                                 (context) =>
-                                    const Beranda(), // Mengarahkan ke Beranda
+                                    const HomePage(), // Mengarahkan ke HomePage
                           ),
                         );
                       } else {
-                        // ❌ Tampilkan pesan jika kosong
+                        // Login gagal, tampilkan pesan error
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Username dan password wajib diisi'),
-                          ),
+                          SnackBar(content: Text('Login gagal: $errorMessage')),
                         );
                       }
                     },

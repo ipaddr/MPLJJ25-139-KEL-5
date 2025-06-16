@@ -1,6 +1,29 @@
 import 'package:flutter/material.dart';
-import 'menu.dart'; // Pastikan file ini ada
-import 'nerimabantuan.dart'; // Mengimpor kelas Sekolah dari sini. Kelas Sekolah ini TIDAK const.
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Cloud Firestore
+import 'package:intl/intl.dart'; // Import untuk format tanggal
+import 'package:bento_buddy/sekolah.dart'; // Import file sekolah.dart (yang berisi model Sekolah dan SekolahPage)
+import 'package:bento_buddy/menu.dart'; // Import menu.dart (pastikan path ini benar)
+
+// HAPUS SEPENUHNYA DEFINISI KELAS SEKOLAH DARI SINI.
+// Definisi kelas Sekolah sudah dipindahkan ke `sekolah.dart`.
+// class Sekolah {
+//   final String nama;
+//   final String alamat;
+//   final String catering;
+//   final String total;
+//   final String tanggal;
+//   final String logoPath;
+
+//   Sekolah({
+//     required this.nama,
+//     required this.alamat,
+//     required this.catering,
+//     required this.total,
+//     required this.tanggal,
+//     required this.logoPath,
+//   });
+// }
 
 class Blmnerimabantuan extends StatefulWidget {
   const Blmnerimabantuan({super.key});
@@ -11,87 +34,79 @@ class Blmnerimabantuan extends StatefulWidget {
 
 class _BlmnerimabantuanState extends State<Blmnerimabantuan> {
   final TextEditingController _searchController = TextEditingController();
-  List<Sekolah> semuaSekolahBlmTerima = [];
-  List<Sekolah> hasilPencarian = [];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  List<Sekolah> _allSchoolsData = []; // Data sekolah dari Firestore
+  List<Sekolah> _filteredSchoolsData = []; // Hasil pencarian
+  Map<String, String> _cateringsMap = {}; // Map: cateringId -> cateringName
 
   @override
   void initState() {
     super.initState();
-    // Data dummy untuk sekolah yang BELUM menerima bantuan, sesuai gambar.
-    // List ini sekarang inisialisasi non-const karena kelas Sekolah TIDAK const.
-    semuaSekolahBlmTerima = [
-      // **Hapus 'const' di sini**
-      Sekolah(
-        nama: 'SD N 01 Padang',
-        alamat: 'Jl. Parit No 8 Padang', // Asumsi alamat
-        logoPath: 'assets/sekolah.png', // Pastikan aset ini ada
-        // Penting: Anda harus menyediakan semua parameter 'required' dari konstruktor Sekolah
-        catering: '', // Nilai kosong karena belum menerima bantuan
-        total: '', // Nilai kosong karena belum menerima bantuan
-        tanggal: '', // Nilai kosong karena belum menerima bantuan
-      ),
-      Sekolah(
-        nama: 'SD N 02 Padang',
-        alamat: 'Jl. Air Tawar Barat', // Asumsi alamat
-        logoPath: 'assets/sekolah.png',
-        catering: '',
-        total: '',
-        tanggal: '',
-      ),
-      Sekolah(
-        nama: 'SD N 03 Padang',
-        alamat: 'Jl. Steba', // Asumsi alamat
-        logoPath: 'assets/sekolah.png',
-        catering: '',
-        total: '',
-        tanggal: '',
-      ),
-      Sekolah(
-        nama: 'SD N 01 Padang', // Duplikasi sesuai gambar
-        alamat: 'Jl. Khatib Sulaiman', // Asumsi alamat
-        logoPath: 'assets/sekolah.png',
-        catering: '',
-        total: '',
-        tanggal: '',
-      ),
-      Sekolah(
-        nama: 'SD N 02 Padang', // Duplikasi sesuai gambar
-        alamat: 'Jl. Kapau Koto Panjang', // Asumsi alamat
-        logoPath: 'assets/sekolah.png',
-        catering: '',
-        total: '',
-        tanggal: '',
-      ),
-      Sekolah(
-        nama: 'SD N 03 Padang', // Sesuai gambar, saya asumsikan SD N 03 Darlann
-        alamat: 'Jl. Darlann', // Asumsi alamat
-        logoPath: 'assets/sekolah.png',
-        catering: '',
-        total: '',
-        tanggal: '',
-      ),
-      // Tambahkan data sekolah lain yang belum menerima bantuan di sini
-    ];
-    hasilPencarian = semuaSekolahBlmTerima;
+    _loadInitialData(); // Muat data dari Firebase
     _searchController.addListener(_filterSekolah);
+  }
+
+  // Fungsi untuk memuat data sekolah dari Firestore
+  Future<void> _loadInitialData() async {
+    // Muat semua data katering terlebih dahulu untuk resolusi nama
+    QuerySnapshot cateringSnapshot =
+        await _firestore.collection('caterings').get();
+    for (var doc in cateringSnapshot.docs) {
+      _cateringsMap[doc.id] =
+          doc['cateringName'] ?? 'Nama Catering Tidak Ditemukan';
+    }
+
+    // Mendengarkan perubahan pada koleksi 'schools'
+    // Filter untuk sekolah yang BELUM menerima bantuan (isApproved: false)
+    _firestore
+        .collection('schools')
+        .where(
+          'isApproved',
+          isEqualTo: false,
+        ) // Filter khusus untuk sekolah yang belum disetujui/menerima bantuan
+        .snapshots()
+        .listen(
+          (snapshot) {
+            List<Sekolah> loadedSchools =
+                snapshot.docs
+                    .map((doc) => Sekolah.fromFirestore(doc, _cateringsMap))
+                    .toList();
+            setState(() {
+              _allSchoolsData = loadedSchools;
+              _filterSekolah(); // Terapkan filter setelah data dimuat/diperbarui
+            });
+          },
+          onError: (error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error loading schools: $error')),
+            );
+          },
+        );
   }
 
   void _filterSekolah() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      hasilPencarian =
-          semuaSekolahBlmTerima
-              .where(
-                (s) =>
-                    s.nama.toLowerCase().contains(query) ||
-                    s.alamat.toLowerCase().contains(query),
-              )
-              .toList();
+      if (query.isEmpty) {
+        _filteredSchoolsData = _allSchoolsData;
+      } else {
+        _filteredSchoolsData =
+            _allSchoolsData
+                .where(
+                  (s) =>
+                      s.nama.toLowerCase().contains(query) ||
+                      s.alamat.toLowerCase().contains(query) ||
+                      (s.cateringName?.toLowerCase().contains(query) ?? false),
+                )
+                .toList();
+      }
     });
   }
 
   @override
   void dispose() {
+    _searchController.removeListener(_filterSekolah);
     _searchController.dispose();
     super.dispose();
   }
@@ -125,7 +140,7 @@ class _BlmnerimabantuanState extends State<Blmnerimabantuan> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 Text(
-                  'Farastika Allistio',
+                  'Farastika Allistio', // Ini masih hardcoded di sini
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -133,7 +148,7 @@ class _BlmnerimabantuanState extends State<Blmnerimabantuan> {
                   ),
                 ),
                 Text(
-                  'Laper\'in Gathering',
+                  'Laper\'in Gathering', // Ini masih hardcoded di sini
                   style: TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ],
@@ -176,20 +191,37 @@ class _BlmnerimabantuanState extends State<Blmnerimabantuan> {
               )
             else
               const Text(
-                "Hasil penelusuran untuk 'Sumatera Barat'",
+                "Sekolah yang belum menerima bantuan:", // Default teks untuk halaman ini
                 style: TextStyle(fontSize: 12, color: Colors.blue),
               ),
             const SizedBox(height: 10),
             Expanded(
-              child: ListView.builder(
-                itemCount: hasilPencarian.length,
-                itemBuilder: (context, index) {
-                  final sekolah = hasilPencarian[index];
-                  return SchoolManagedCard(
-                    sekolah: sekolah,
-                  ); // Menggunakan kartu yang disesuaikan
-                },
-              ),
+              child:
+                  _allSchoolsData.isEmpty && _filteredSchoolsData.isEmpty
+                      ? const Center(
+                        child: CircularProgressIndicator(),
+                      ) // Tampilkan loading
+                      : ListView.builder(
+                        itemCount: _filteredSchoolsData.length,
+                        itemBuilder: (context, index) {
+                          final sekolah = _filteredSchoolsData[index];
+                          return SchoolManagedCard(
+                            // Menggunakan SchoolManagedCard
+                            sekolah: sekolah, // Meneruskan objek Sekolah
+                            onTap: () {
+                              // Tambahkan onTap agar kartu bisa diklik
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) =>
+                                          SekolahPage(sekolahData: sekolah),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
             ),
           ],
         ),
@@ -199,7 +231,9 @@ class _BlmnerimabantuanState extends State<Blmnerimabantuan> {
 
   Widget _buildSearchBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 0),
+      margin: const EdgeInsets.symmetric(
+        horizontal: 0,
+      ), // Dihapus margin horizontal 16
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white, // Warna background putih sesuai gambar
@@ -236,69 +270,127 @@ class _BlmnerimabantuanState extends State<Blmnerimabantuan> {
 }
 
 // Card untuk menampilkan sekolah yang dikelola (mirip dengan yang ada di laperin_catering.dart)
+// Menggunakan model Sekolah dari sekolah.dart
 class SchoolManagedCard extends StatelessWidget {
   final Sekolah sekolah; // Menggunakan model Sekolah
+  final VoidCallback onTap; // Tambahkan onTap
 
-  const SchoolManagedCard({super.key, required this.sekolah});
+  const SchoolManagedCard({
+    super.key,
+    required this.sekolah,
+    required this.onTap,
+  }); // Perbarui konstruktor
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
+    return InkWell(
+      // Bungkus dengan InkWell agar bisa diklik
+      onTap: onTap,
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Image.asset(
+                  sekolah.logoPath ??
+                      'assets/school_building.png', // Menggunakan logoPath dari objek sekolah
+                  height: 60,
+                  width: 60,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/school_building.png', // Fallback gedung sekolah (pastikan aset ini ada)
+                      height: 60,
+                      width: 60,
+                      fit: BoxFit.contain,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 15),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      sekolah.nama,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text(
+                      sekolah.alamat,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    // Opsional: Anda bisa menampilkan properti catering, total, tanggal jika ingin
+                    // Meskipun untuk "belum menerima bantuan", nilai-nilai ini mungkin kosong atau "Tidak Tersedia".
+                    if (sekolah.cateringName != null &&
+                        sekolah.cateringName!.isNotEmpty)
+                      Text(
+                        'Catering: ${sekolah.cateringName}',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    // Contoh jika ingin menampilkan tanggal konfirmasi walaupun belum disetujui (misal: tanggal pengajuan)
+                    // if (sekolah.tanggalKonfirmasi != null && sekolah.tanggalKonfirmasi!.isNotEmpty)
+                    //   Text('Diajukan: ${sekolah.tanggalKonfirmasi}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// CustomHeader yang Anda sediakan di nerimabantuan.dart (ini akan dipertahankan di sini)
+// Jika Anda ingin CustomHeader ini menampilkan nama & peran dinamis, itu akan membutuhkan
+// perubahan yang sama seperti di CustomHeader pada home_page.dart
+class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
+  final VoidCallback onMenuPressed;
+
+  const CustomHeader({super.key, required this.onMenuPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: const BoxDecoration(
+        color: Color(0xFF1E2378),
+        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(40)),
+      ),
+      child: SafeArea(
+        // Tambahkan SafeArea untuk menghindari tumpang tindih dengan status bar
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Image.asset(
-                sekolah.logoPath, // Menggunakan logoPath dari objek sekolah
-                height: 60,
-                width: 60,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/school_building.png', // Fallback gedung sekolah (pastikan aset ini ada)
-                    height: 60,
-                    width: 60,
-                    fit: BoxFit.contain,
-                  );
-                },
-              ),
+            Image.asset('assets/logo.png', width: 24, height: 24),
+            const SizedBox(width: 8),
+            const Text(
+              'Farastika Allistio\nLaper\'in Catering', // Teks ini masih hardcoded
+              style: TextStyle(color: Colors.white, fontSize: 12),
             ),
-            const SizedBox(width: 15),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    sekolah.nama,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text(
-                    sekolah.alamat,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  // Opsional: Anda bisa menampilkan properti catering, total, tanggal jika ingin
-                  // Meskipun untuk "belum menerima bantuan", nilai-nilainya mungkin kosong.
-                  // Text('Catering: ${sekolah.catering}', style: const TextStyle(fontSize: 12)),
-                  // Text('Total: ${sekolah.total}', style: const TextStyle(fontSize: 12)),
-                  // Text(sekolah.tanggal, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                ],
-              ),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: onMenuPressed,
             ),
           ],
         ),
       ),
     );
   }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(100.0); // Implementasi ukuran AppBar
 }

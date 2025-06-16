@@ -1,3 +1,15 @@
+buildscript { // <-- BLOK INI DENGAN SINTAKS KOTLIN DSL
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Gunakan `classpath(...)` untuk Kotlin DSL
+        classpath("com.android.tools.build:gradle:8.1.4") // Sesuaikan versi Gradle Anda
+        classpath("com.google.gms:google-services:4.4.1") // Gunakan versi stabil terbaru
+    }
+}
+
 allprojects {
     repositories {
         google()

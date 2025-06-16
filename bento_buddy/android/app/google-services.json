@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "438949279025",
+    "project_id": "bento-buddy",
+    "storage_bucket": "bento-buddy.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:438949279025:android:3eda174eb0e8a78eecac10",
+        "android_client_info": {
+          "package_name": "com.example.bento_buddy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKa2rWVs-WGU-yI4jTonUiOwKkLBDC788"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
