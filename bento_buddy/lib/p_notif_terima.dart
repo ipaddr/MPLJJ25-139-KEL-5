@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'blmnerimabantuan.dart'; // Import halaman Beranda untuk navigasi setelah notifikasi pengajuan
+import 'p_sekolah.dart'; // Import halaman Beranda untuk navigasi setelah notifikasi pengajuan
 // Asumsi halaman pengajuan yang memanggil notifikasi ini adalah pengajuanpage.dart
 // Tidak perlu mengimpor 'upload_menu.dart' atau 'menu_hari_ini.dart' di sini.
 
-class NotifAjukanPage extends StatelessWidget {
-  const NotifAjukanPage({super.key});
+class PNotifterima extends StatelessWidget {
+  const PNotifterima({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class NotifAjukanPage extends StatelessWidget {
                     ),
                   ),
                   const Text(
-                    'Berhasil Terkirim', // Teks notifikasi
+                    'Berhasil Diterima', // Teks notifikasi
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 22,
@@ -69,7 +69,7 @@ class NotifAjukanPage extends StatelessWidget {
                 // Navigasi ke halaman Beranda dan hapus semua rute sebelumnya
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
-                    builder: (context) => const Blmnerimabantuan(),
+                    builder: (context) => const PDataSekolahPage(),
                   ),
                   (Route<dynamic> route) =>
                       false, // Menghapus semua rute dari stack

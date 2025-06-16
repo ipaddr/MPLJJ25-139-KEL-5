@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'menu.dart'; // Import halaman menu untuk navigasi ke sana
-import 'upload_menu.dart'; // Asumsikan ada file ini untuk halaman upload menu
+import 'p_menu.dart'; // Import halaman menu untuk navigasi ke sana
+// Hapus: import 'upload_menu.dart'; // Asumsikan ada file ini untuk halaman upload menu
 
 // Asumsi model CateringMenu sudah ada atau didefinisikan di sini
 class CateringMenu {
@@ -17,14 +17,14 @@ class CateringMenu {
   });
 }
 
-class MenuHariIni extends StatefulWidget {
-  const MenuHariIni({super.key});
+class SMenuHariIni extends StatefulWidget {
+  const SMenuHariIni({super.key});
 
   @override
-  State<MenuHariIni> createState() => _MenuHariIniState();
+  State<SMenuHariIni> createState() => _SMenuHariIniState();
 }
 
-class _MenuHariIniState extends State<MenuHariIni> {
+class _SMenuHariIniState extends State<SMenuHariIni> {
   final TextEditingController _searchController = TextEditingController();
   List<CateringMenu> semuaMenu = [];
   List<CateringMenu> hasilPencarianMenu = [];
@@ -195,7 +195,7 @@ class _MenuHariIniState extends State<MenuHariIni> {
                   ),
                 ),
                 const SizedBox(height: 10), // Spasi di bawah info user
-                // Baris kedua AppBar: Tombol kembali, judul "Menu Hari Ini", dan "Upload Menu"
+                // Baris kedua AppBar: Tombol kembali dan judul "Menu Hari Ini"
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
@@ -222,28 +222,7 @@ class _MenuHariIniState extends State<MenuHariIni> {
                           ),
                         ),
                       ),
-                      // Bagian "Upload Menu"
-                      GestureDetector(
-                        onTap: () {
-                          // Navigasi ke halaman upload menu
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const UploadMenuPage(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          'Upload Menu', // [Image of Upload Menu]
-                          style: TextStyle(
-                            color:
-                                Colors
-                                    .blueAccent, // Warna biru seperti di gambar
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600, // Sedikit lebih tebal
-                          ),
-                        ),
-                      ),
+                      // Hapus: Bagian "Upload Menu" telah dihapus dari sini
                     ],
                   ),
                 ),
