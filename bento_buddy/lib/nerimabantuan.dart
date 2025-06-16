@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'sekolah.dart'; // Import file sekolah.dart
+import 'menu.dart'; // Import menu.dart
 
 class Sekolah {
   final String nama;
@@ -35,12 +37,12 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
     super.initState();
     semuaSekolah = [
       Sekolah(
-        nama: 'SDN 1 Surakarta Barat',
-        alamat: 'Jl. Melati No.1',
+        nama: 'SDN 01 Padang',
+        alamat: 'Jl. Parkit No. 8 Padang',
         catering: 'Laper\'in Catering',
         total: '1.700 Porsi/hari',
         tanggal: 'since 09 November 2024',
-        logoPath: 'logosdn.png',
+        logoPath: 'assets/logosdn.png', // Pastikan path ini benar
       ),
       Sekolah(
         nama: 'SMPN 2 Surakarta Barat',
@@ -48,7 +50,7 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
         catering: 'Anande Catering',
         total: '500 Porsi/hari',
         tanggal: 'since 20 Maret 2024',
-        logoPath: 'logosmp.png',
+        logoPath: 'assets/logosmp.png', // Pastikan path ini benar
       ),
       Sekolah(
         nama: 'SMAN 3 Surakarta Barat',
@@ -56,7 +58,7 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
         catering: 'DeLuna Catering',
         total: '760 Porsi/hari',
         tanggal: 'since 05 Desember 2024',
-        logoPath: 'logosma.png',
+        logoPath: 'assets/logosma.png', // Pastikan path ini benar
       ),
       Sekolah(
         nama: 'SDN 4 Surakarta Timur',
@@ -64,7 +66,7 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
         catering: 'OndeMande Catering',
         total: '287 Porsi/hari',
         tanggal: 'since 12 Desember 2024',
-        logoPath: 'logosdn.png',
+        logoPath: 'assets/logosdn.png', // Pastikan path ini benar
       ),
       Sekolah(
         nama: 'SMPN 5 Surakarta Timur',
@@ -72,7 +74,7 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
         catering: 'Golden City Catering',
         total: '456 Porsi/hari',
         tanggal: 'since 17 April 2024',
-        logoPath: 'logosmp.png',
+        logoPath: 'assets/logosmp.png', // Pastikan path ini benar
       ),
     ];
     hasilPencarian = semuaSekolah;
@@ -101,7 +103,15 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
       body: SafeArea(
         child: Column(
           children: [
-            const CustomHeader(),
+            // Meneruskan Navigator ke CustomHeader agar bisa mengakses Navigator.push
+            CustomHeader(
+              onMenuPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Menu()),
+                );
+              },
+            ),
             const SizedBox(height: 16),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
@@ -134,7 +144,18 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
                     catering: sekolah.catering,
                     total: sekolah.total,
                     tanggal: sekolah.tanggal,
-                    logoPath: 'assets/${sekolah.logoPath}',
+                    logoPath:
+                        sekolah
+                            .logoPath, // Meneruskan logoPath dari model Sekolah
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => SekolahPage(sekolahData: sekolah),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -185,6 +206,7 @@ class ListItemWidget extends StatelessWidget {
   final String total;
   final String tanggal;
   final String logoPath;
+  final VoidCallback onTap;
 
   const ListItemWidget({
     super.key,
@@ -194,51 +216,65 @@ class ListItemWidget extends StatelessWidget {
     required this.total,
     required this.tanggal,
     required this.logoPath,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                logoPath,
-                width: 50,
-                height: 50,
-                fit: BoxFit.cover,
+    return InkWell(
+      onTap: onTap,
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  logoPath,
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(
+                      Icons.broken_image,
+                      size: 50,
+                      color: Colors.grey,
+                    );
+                  },
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    nama,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(alamat, style: const TextStyle(fontSize: 12)),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Catering: $catering',
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                  Text('Jumlah: $total', style: const TextStyle(fontSize: 12)),
-                  Text(
-                    tanggal,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      nama,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(alamat, style: const TextStyle(fontSize: 12)),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Catering: $catering',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    Text(
+                      'Jumlah: $total',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    Text(
+                      tanggal,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -246,7 +282,9 @@ class ListItemWidget extends StatelessWidget {
 }
 
 class CustomHeader extends StatelessWidget {
-  const CustomHeader({super.key});
+  final VoidCallback onMenuPressed; // Tambahkan properti VoidCallback
+
+  const CustomHeader({super.key, required this.onMenuPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -267,7 +305,7 @@ class CustomHeader extends StatelessWidget {
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () {},
+            onPressed: onMenuPressed, // Panggil callback saat ikon ditekan
           ),
         ],
       ),

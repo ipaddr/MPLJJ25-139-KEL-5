@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 // Import halaman-halaman tujuan
-import 'nerimabantuan.dart';
+import 'nerimabantuan.dart'; // Sudah benar
 import 'blmnerimabantuan.dart';
+import 'sekolah.dart'; // Tambahkan import SekolahPage agar bisa kembali ke halaman detail sekolah
 import 'jasa_catering.dart';
-import 'pengajuanpage.dart';
-import 'laporan.dart';
-import 'profil.dart';
+import 'pengajuanpage.dart'; // asumsi ada PengajuanSekolahPage
+import 'laporan.dart'; // asumsi ada LaporanPage
+import 'profil.dart'; // asumsi ada ProfilPage
 
 class Menu extends StatelessWidget {
   const Menu({super.key});
@@ -35,7 +36,18 @@ class Menu extends StatelessWidget {
               ],
             ),
             const Spacer(),
-            const Icon(Icons.menu, color: Colors.white),
+            // Ikon menu di Menu AppBar juga harusnya tidak navigasi kemana-mana atau pop
+            IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: () {
+                // Di halaman menu, menekan ikon menu bisa jadi untuk menutup menu
+                // atau tidak melakukan apa-apa.
+                // Jika menu ini adalah root dari navigasi, Anda mungkin ingin pop.
+                // Jika ini adalah halaman yang bisa diakses dari berbagai tempat,
+                // maka Navigator.pop() akan membawa kembali ke halaman sebelumnya.
+                Navigator.pop(context);
+              },
+            ),
           ],
         ),
       ),
@@ -60,6 +72,7 @@ class Menu extends StatelessWidget {
                     context,
                     'assets/menerima.png',
                     'Menerima Bantuan',
+                    // Navigasi ke DataSekolahPage
                     const DataSekolahPage(),
                   ),
                   _buildMenuItem(
@@ -101,7 +114,7 @@ class Menu extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context); // Kembali ke halaman sebelumnya
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1B1464),
@@ -117,6 +130,9 @@ class Menu extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     // TODO: implement logout logic
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Logout ditekan!')),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1B1464),
@@ -162,7 +178,17 @@ class Menu extends StatelessWidget {
               color: Colors.teal[200],
             ),
             padding: const EdgeInsets.all(12),
-            child: Image.asset(imagePath, fit: BoxFit.contain),
+            child: Image.asset(
+              imagePath,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(
+                  Icons.broken_image,
+                  size: 50,
+                  color: Colors.grey,
+                ); // Fallback ikon
+              },
+            ),
           ),
           const SizedBox(height: 10),
           Container(

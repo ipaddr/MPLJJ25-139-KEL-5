@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'nerimabantuan.dart'; // Pastikan path ini benar
+import 'menu.dart'; // Import menu.dart
 
 void main() {
   runApp(const MyApp());
@@ -13,13 +15,17 @@ class MyApp extends StatelessWidget {
       title: 'School Details',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const SekolahPage(),
+      // Set home ke DataSekolahPage sebagai halaman awal
+      // Anda bisa mengubah ini ke Menu() jika Menu adalah halaman pertama
+      home: const DataSekolahPage(),
     );
   }
 }
 
 class SekolahPage extends StatelessWidget {
-  const SekolahPage({super.key});
+  final Sekolah sekolahData;
+
+  const SekolahPage({super.key, required this.sekolahData});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +33,7 @@ class SekolahPage extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading:
-            false, // Menghilangkan tombol kembali default
+            false, // Menghilangkan tombol kembali default dari AppBar
         toolbarHeight: 100,
         backgroundColor: const Color(0xFF271A5A),
         title: Row(
@@ -35,7 +41,7 @@ class SekolahPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
               child: Image.asset(
-                'assets/logo.png', // Placeholder untuk gambar logo
+                'assets/logo.png', // Logo utama aplikasi
                 height: 50,
                 width: 50,
               ),
@@ -63,9 +69,10 @@ class SekolahPage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.menu, color: Colors.white, size: 30),
             onPressed: () {
-              // Handle ketika tombol menu ditekan
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Tombol Menu ditekan!')),
+              // Navigasi ke halaman Menu
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Menu()),
               );
             },
           ),
@@ -81,13 +88,9 @@ class SekolahPage extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      // Handle ketika tombol kembali ditekan
-                      // Biasanya menggunakan Navigator.pop(context) untuk kembali ke halaman sebelumnya
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Tombol Kembali ditekan!'),
-                        ),
-                      );
+                      Navigator.pop(
+                        context,
+                      ); // Kembali ke halaman sebelumnya (DataSekolahPage)
                     },
                     child: const Icon(
                       Icons.arrow_back_ios,
@@ -95,9 +98,9 @@ class SekolahPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Text(
-                    'SD N 01 Padang',
-                    style: TextStyle(
+                  Text(
+                    sekolahData.nama, // Nama sekolah dari data dinamis
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -108,10 +111,19 @@ class SekolahPage extends StatelessWidget {
             ),
             Center(
               child: Image.asset(
-                'assets/school_building.png', // Placeholder untuk gambar gedung sekolah
+                sekolahData
+                    .logoPath, // Menggunakan logoPath dari objek sekolahData
                 height: 200,
                 width: 300,
                 fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/school_building.png', // Gambar default jika logo sekolah tidak ada
+                    height: 200,
+                    width: 300,
+                    fit: BoxFit.contain,
+                  );
+                },
               ),
             ),
             const SizedBox(height: 20),
@@ -123,14 +135,22 @@ class SekolahPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Column(
-                // PERBAIKAN: Hapus 'const' di sini karena metode tidak bisa dipanggil dalam konstanta compile-time.
-                children: [
-                  _buildDetailRow('Nama Instansi', 'SD N 01 Padang'),
-                  _buildDetailRow('Alamat', 'Jl. Parit No. 8 Padang'),
-                  _buildDetailRow('Kepala Sekolah', 'Farastika Allistio Putri'),
-                  _buildDetailRow('Kontak', '085378707219'),
-                  _buildDetailRow('Email', 'sdn01padang@gmail.com'),
-                  _buildDetailRow('Total Dana', 'Rp. 200.000.000 / Bulan'),
+                children: <Widget>[
+                  _buildDetailRow('Nama Instansi', sekolahData.nama),
+                  _buildDetailRow('Alamat', sekolahData.alamat),
+                  _buildDetailRow(
+                    'Kepala Sekolah',
+                    'Farastika Allistio Putri',
+                  ), // Hardcoded
+                  _buildDetailRow('Kontak', '085378707219'), // Hardcoded
+                  _buildDetailRow(
+                    'Email',
+                    'sdn01padang@gmail.com',
+                  ), // Hardcoded
+                  _buildDetailRow(
+                    'Total Dana',
+                    'Rp. 200.000.000 / Bulan',
+                  ), // Hardcoded
                 ],
               ),
             ),
@@ -143,20 +163,18 @@ class SekolahPage extends StatelessWidget {
                     const SnackBar(content: Text('Ikon Email ditekan!')),
                   );
                 }),
-                // PERBAIKAN: Menggunakan ikon chat_bubble yang tersedia di Material Icons
-                _buildSocialIcon(Icons.chat_bubble, () {
+                _buildSocialIcon(Icons.message, () {
+                  // Menggunakan Icons.message sebagai alternatif WhatsApp
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Ikon WhatsApp ditekan!')),
                   );
                 }),
                 _buildSocialIcon(Icons.camera_alt, () {
-                  // Ikon mirip Instagram
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Ikon Instagram ditekan!')),
                   );
                 }),
                 _buildSocialIcon(Icons.send, () {
-                  // Ikon mirip Telegram
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Ikon Telegram ditekan!')),
                   );
@@ -178,18 +196,18 @@ class SekolahPage extends StatelessWidget {
             const SizedBox(height: 15),
             _buildCateringCard(
               context,
-              'assets/catering_logo_1.png', // Placeholder untuk logo catering 1
-              'Laper\'in Catering',
-              'Jl. Cendrawasih No. 27 - 12 Air Tawar Barat',
-              '1.758 porsi/hari',
-              '08 November 2024',
+              'assets/laper.png', // Logo Laper'in Catering
+              sekolahData.catering,
+              sekolahData.alamat,
+              sekolahData.total,
+              sekolahData.tanggal,
             ),
             const SizedBox(height: 15),
             _buildCateringCard(
               context,
-              'assets/catering_logo_2.png', // Placeholder untuk logo catering 2
+              'assets/ondemande.png', // Logo OndeMande Catering
               'OndeMande Catering',
-              'Jl. Parkit No. 8 Padang',
+              'Jl. Parkit No. 8 Padang', // Hardcoded
               '1.768 porsi/hari',
               '09 November 2024',
             ),
@@ -200,7 +218,6 @@ class SekolahPage extends StatelessWidget {
     );
   }
 
-  // Metode pembantu untuk membuat baris detail informasi
   static Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -227,7 +244,6 @@ class SekolahPage extends StatelessWidget {
     );
   }
 
-  // Metode pembantu untuk membuat ikon sosial yang dapat diklik
   static Widget _buildSocialIcon(IconData icon, VoidCallback onPressed) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -237,7 +253,7 @@ class SekolahPage extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: Color(0xFFE0E0E0), // Latar belakang abu-abu muda untuk ikon
+            color: Color(0xFFE0E0E0),
           ),
           child: Icon(icon, color: const Color(0xFF271A5A), size: 24),
         ),
@@ -245,7 +261,6 @@ class SekolahPage extends StatelessWidget {
     );
   }
 
-  // Metode pembantu untuk membuat kartu informasi catering
   static Widget _buildCateringCard(
     BuildContext context,
     String logoAsset,
@@ -274,7 +289,7 @@ class SekolahPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.grey[200], // Latar belakang untuk logo perusahaan
+              color: Colors.grey[200],
               borderRadius: BorderRadius.circular(8),
             ),
             child: Image.asset(
@@ -282,6 +297,13 @@ class SekolahPage extends StatelessWidget {
               height: 60,
               width: 60,
               fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(
+                  Icons.broken_image,
+                  size: 60,
+                  color: Colors.grey,
+                );
+              },
             ),
           ),
           const SizedBox(width: 15),
