@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ProfilPage extends StatelessWidget {
-  const ProfilPage({super.key});
+class UProfilPage extends StatelessWidget {
+  const UProfilPage({super.key});
 
   @override
   Widget build(BuildContext context) {

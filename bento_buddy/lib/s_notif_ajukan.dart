@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'blmnerimabantuan.dart'; // Import halaman Beranda untuk navigasi setelah notifikasi pengajuan
+import 'blmnerimabantuan.dart';
+import 's_pengajuanpage.dart'; // Import halaman Beranda untuk navigasi setelah notifikasi pengajuan
 // Asumsi halaman pengajuan yang memanggil notifikasi ini adalah pengajuanpage.dart
 // Tidak perlu mengimpor 'upload_menu.dart' atau 'menu_hari_ini.dart' di sini.
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 // Asumsi 'upload_menu_page.dart' adalah nama file yang benar
 // Jika file Anda bernama 'upload_menu.dart', harap sesuaikan import ini.
-import 'upload_menu.dart'; // Import halaman upload menu jika diperlukan
-import 'menu_hari_ini.dart'; // Import halaman MenuHariIni Anda
+import 'c_upload_menu.dart'; // Import halaman upload menu jika diperlukan
+import 'c_menu_hari_ini.dart'; // Import halaman MenuHariIni Anda
 
 class NotifMenuPage extends StatelessWidget {
   const NotifMenuPage({super.key});
