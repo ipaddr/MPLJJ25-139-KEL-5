@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'register_page.dart'; // Import RegisterPage
-import 'login_page.dart'; // Import LoginPage (asumsi nama file dan kelas)
+import 'login_page.dart'; // Import LoginPage
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -10,12 +10,12 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          // Asumsi 'assets/background.png' adalah gambar latar belakang
+          // Asumsi 'assets/background.png' adalah gambar latar belakang yang ada
           image: DecorationImage(
             image: AssetImage('assets/background.png'),
             fit: BoxFit.cover,
-            // Anda bisa menambahkan errorBuilder di sini juga untuk fallback gambar
-            // errorBuilder: (context, error, stackTrace) => Container(color: Colors.blueGrey),
+            // Anda bisa menambahkan errorBuilder di sini untuk debugging jika gambar tidak muncul
+            // errorBuilder: (context, error, stackTrace) => Container(color: Colors.red.shade900),
           ),
         ),
         child: SafeArea(
@@ -34,6 +34,7 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
+                // Tombol Login
                 ElevatedButton(
                   onPressed: () {
                     // Navigasi ke LoginPage menggunakan MaterialPageRoute
@@ -55,17 +56,14 @@ class HomePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(
-                      fontSize: 16,
-                    ), // Tambahkan ukuran font untuk konsistensi
-                  ),
+                  child: const Text('Login', style: TextStyle(fontSize: 16)),
                 ),
                 const SizedBox(height: 16),
+                // Tombol Register
                 ElevatedButton(
                   onPressed: () {
                     // Navigasi ke RegisterPage menggunakan MaterialPageRoute
+                    // Tombol ini SEHARUSNYA sudah bisa diklik karena onPressed sudah diatur.
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -84,12 +82,7 @@ class HomePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text(
-                    'Register',
-                    style: TextStyle(
-                      fontSize: 16,
-                    ), // Tambahkan ukuran font untuk konsistensi
-                  ),
+                  child: const Text('Register', style: TextStyle(fontSize: 16)),
                 ),
               ],
             ),
