@@ -2,11 +2,19 @@ import 'package:flutter/material.dart';
 // Import halaman-halaman tujuan
 import 'nerimabantuan.dart'; // Sudah benar
 import 'blmnerimabantuan.dart';
-import 'sekolah.dart'; // Tambahkan import SekolahPage agar bisa kembali ke halaman detail sekolah
 import 'jasa_catering.dart';
 import 'pengajuanpage.dart'; // asumsi ada PengajuanSekolahPage
 import 'laporan.dart'; // asumsi ada LaporanPage
 import 'profil.dart'; // asumsi ada ProfilPage
+
+// Import CustomHeader dari beranda.dart (atau lokasi aslinya jika sudah terpisah)
+// Agar CustomHeader konsisten di seluruh aplikasi, idealnya ditempatkan di file terpisah
+// yang dapat diimpor oleh semua halaman. Untuk saat ini, saya akan mengimpornya.
+// Jika CustomHeader belum terpisah, pastikan Anda memisahkan CustomHeader dari beranda.dart
+// ke file baru (misalnya custom_header.dart) dan import di sini.
+// Untuk tujuan ini, saya akan menggunakan nama CustomHeaderApp sebagai pembeda
+// jika ada CustomHeader lain di proyek Anda.
+import 'beranda.dart'; // Mengimpor CustomHeaderBeranda dari beranda.dart (asumsi nama CustomHeader di beranda.dart adalah CustomHeaderBeranda)
 
 class Menu extends StatelessWidget {
   const Menu({super.key});
@@ -20,7 +28,11 @@ class Menu extends StatelessWidget {
         toolbarHeight: 80,
         title: Row(
           children: [
-            const Icon(Icons.school, size: 32, color: Colors.white),
+            const Icon(
+              Icons.school,
+              size: 32,
+              color: Colors.white,
+            ), // Atau Image.asset('assets/logo.png', width: 32, height: 32)
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +57,7 @@ class Menu extends StatelessWidget {
                 // Jika menu ini adalah root dari navigasi, Anda mungkin ingin pop.
                 // Jika ini adalah halaman yang bisa diakses dari berbagai tempat,
                 // maka Navigator.pop() akan membawa kembali ke halaman sebelumnya.
-                Navigator.pop(context);
+                Navigator.pop(context); // Kembali ke halaman sebelumnya
               },
             ),
           ],
@@ -70,39 +82,41 @@ class Menu extends StatelessWidget {
                 children: [
                   _buildMenuItem(
                     context,
-                    'assets/menerima.png',
+                    'assets/menerima.png', // Pastikan aset ini ada
                     'Menerima Bantuan',
-                    // Navigasi ke DataSekolahPage
-                    const DataSekolahPage(),
+                    const DataSekolahPage(), // Navigasi ke DataSekolahPage
                   ),
                   _buildMenuItem(
                     context,
-                    'assets/belum_menerima.png',
+                    'assets/belum_menerima.png', // Pastikan aset ini ada
                     'Belum Menerima Bantuan',
                     const Blmnerimabantuan(),
                   ),
                   _buildMenuItem(
                     context,
-                    'assets/cathering.png',
+                    'assets/cathering.png', // Pastikan aset ini ada
                     'Cathering',
                     const JasaCateringPage(),
                   ),
                   _buildMenuItem(
                     context,
-                    'assets/ajukan.png',
+                    'assets/ajukan.png', // Pastikan aset ini ada
                     'Ajukan Sekolah',
+                    // Pastikan PengajuanSekolahPage ada di pengajuanpage.dart
                     const PengajuanSekolahPage(),
                   ),
                   _buildMenuItem(
                     context,
-                    'assets/laporan.png',
+                    'assets/laporan.png', // Pastikan aset ini ada
                     'Laporan',
+                    // Pastikan LaporanPage ada di laporan.dart
                     const LaporanPage(),
                   ),
                   _buildMenuItem(
                     context,
-                    'assets/profil.png',
+                    'assets/profil.png', // Pastikan aset ini ada
                     'Profil',
+                    // Pastikan ProfilPage ada di profil.dart
                     const ProfilPage(),
                   ),
                 ],
@@ -175,7 +189,7 @@ class Menu extends StatelessWidget {
             height: 90,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.teal[200],
+              color: Colors.teal[200], // Warna background lingkaran
             ),
             padding: const EdgeInsets.all(12),
             child: Image.asset(
@@ -183,10 +197,11 @@ class Menu extends StatelessWidget {
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
                 return const Icon(
-                  Icons.broken_image,
+                  Icons
+                      .broken_image, // Fallback icon jika gambar tidak ditemukan
                   size: 50,
                   color: Colors.grey,
-                ); // Fallback ikon
+                );
               },
             ),
           ),
@@ -194,7 +209,7 @@ class Menu extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: Colors.grey[300], // Warna background label
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(

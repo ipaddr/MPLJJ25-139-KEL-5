@@ -51,7 +51,7 @@ class PengajuanSekolahPage extends StatelessWidget {
                           // TODO: Submit logic
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey.shade700,
+                          backgroundColor: const Color.fromARGB(255, 21, 6, 87),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),

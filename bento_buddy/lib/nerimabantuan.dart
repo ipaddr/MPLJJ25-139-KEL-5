@@ -45,7 +45,7 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
         logoPath: 'assets/logosdn.png', // Pastikan path ini benar
       ),
       Sekolah(
-        nama: 'SMPN 2 Surakarta Barat',
+        nama: 'SMPN 2 Padang Barat',
         alamat: 'Jl. Kenanga No.5',
         catering: 'Anande Catering',
         total: '500 Porsi/hari',
@@ -53,7 +53,7 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
         logoPath: 'assets/logosmp.png', // Pastikan path ini benar
       ),
       Sekolah(
-        nama: 'SMAN 3 Surakarta Barat',
+        nama: 'SMAN 3 Padang Selatan',
         alamat: 'Jl. Mawar No.10',
         catering: 'DeLuna Catering',
         total: '760 Porsi/hari',
@@ -61,7 +61,7 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
         logoPath: 'assets/logosma.png', // Pastikan path ini benar
       ),
       Sekolah(
-        nama: 'SDN 4 Surakarta Timur',
+        nama: 'SDN 4 Padang Timur',
         alamat: 'Jl. Anggrek No.3',
         catering: 'OndeMande Catering',
         total: '287 Porsi/hari',
@@ -69,7 +69,7 @@ class _DataSekolahPageState extends State<DataSekolahPage> {
         logoPath: 'assets/logosdn.png', // Pastikan path ini benar
       ),
       Sekolah(
-        nama: 'SMPN 5 Surakarta Timur',
+        nama: 'SMPN 5 Padang Utara',
         alamat: 'Jl. Flamboyan No.7',
         catering: 'Golden City Catering',
         total: '456 Porsi/hari',
