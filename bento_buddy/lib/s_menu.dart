@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'nerimabantuan.dart';
 import 'blmnerimabantuan.dart';
 import 'jasa_catering.dart';
-import 'c_menu_hari_ini.dart'; // asumsi ada MenuHariIni
+import 's_menu_hari_ini.dart'; // asumsi ada MenuHariIni
 import 's_profil.dart'; // asumsi ada ProfilPage
 import 'login_page.dart'; // Import LoginPage untuk navigasi logout
 
@@ -101,7 +101,7 @@ class Menu extends StatelessWidget {
                     'assets/laporan.png', // [Image of Laporan Icon]
                     'Menu', // Label diubah menjadi "Menu" sesuai gambar sebelumnya
                     // Pastikan MenuHariIni ada di menu_hari_ini.dart
-                    const MenuHariIni(),
+                    const SMenuHariIni(),
                   ),
                   _buildMenuItem(
                     context,

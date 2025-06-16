@@ -69,7 +69,7 @@ class NotifMenuPage extends StatelessWidget {
               onPressed: () {
                 // Navigasi ke halaman MenuHariIni dan hapus semua rute sebelumnya
                 Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const MenuHariIni()),
+                  MaterialPageRoute(builder: (context) => const CMenuHariIni()),
                   (Route<dynamic> route) =>
                       false, // Menghapus semua rute dari stack
                 );

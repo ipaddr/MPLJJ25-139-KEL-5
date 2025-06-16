@@ -17,14 +17,14 @@ class CateringMenu {
   });
 }
 
-class PMenuHariIni extends StatefulWidget {
-  const PMenuHariIni({super.key});
+class SMenuHariIni extends StatefulWidget {
+  const SMenuHariIni({super.key});
 
   @override
-  State<PMenuHariIni> createState() => _PMenuHariIniState();
+  State<SMenuHariIni> createState() => _SMenuHariIniState();
 }
 
-class _PMenuHariIniState extends State<PMenuHariIni> {
+class _SMenuHariIniState extends State<SMenuHariIni> {
   final TextEditingController _searchController = TextEditingController();
   List<CateringMenu> semuaMenu = [];
   List<CateringMenu> hasilPencarianMenu = [];
