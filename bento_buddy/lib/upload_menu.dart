@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'notif_menu.dart'; // Import NotifMenuPage
+// import 'menu_hari_ini.dart'; // Tidak diperlukan langsung di UploadMenuPage, karena navigasi ke NotifMenuPage
 
 class UploadMenuPage extends StatelessWidget {
   const UploadMenuPage({super.key});
@@ -9,11 +11,15 @@ class UploadMenuPage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const CustomHeader(),
+            // AppBar/Header kustom (seperti di desain Anda)
+            // Saya asumsikan CustomHeader ini ada di file terpisah, misalnya 'widgets/custom_header.dart'
+            // Jika tidak, Anda perlu memindahkan definisi CustomHeader ini ke file yang dapat diakses,
+            // atau memasukkan kode CustomHeader langsung di sini.
+            const CustomHeader(), // Asumsi CustomHeader ada dan sudah diimport atau didefinisikan
 
             const SizedBox(height: 16),
             const Text(
-              'Menu Hari Ini',
+              'Upload Menu', // Mengubah judul menjadi "Upload Menu"
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
@@ -120,10 +126,23 @@ class UploadMenuPage extends StatelessWidget {
                       alignment: Alignment.centerRight,
                       child: ElevatedButton(
                         onPressed: () {
-                          // TODO: Kirim menu logic
+                          // TODO: Tambahkan logika pengiriman menu yang sebenarnya di sini.
+                          // Contoh: validasi form, unggah gambar ke Firebase Storage, simpan data ke Firestore, dll.
+
+                          // Setelah proses pengiriman (dummy) berhasil:
+                          // Navigasi ke NotifMenuPage dan hapus semua rute sebelumnya
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (context) => const NotifMenuPage(),
+                            ),
+                            (Route<dynamic> route) =>
+                                false, // Menghapus semua rute dari stack
+                          );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1E2378),
+                          backgroundColor: const Color(
+                            0xFF1E2378,
+                          ), // Warna biru tua
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
@@ -149,6 +168,11 @@ class UploadMenuPage extends StatelessWidget {
   }
 }
 
+// CustomHeader (dipindahkan di sini jika belum ada di file terpisah yang diimpor)
+// Idealnya, widget seperti CustomHeader ditempatkan di file terpisah
+// (misalnya 'widgets/custom_header.dart') dan diimpor di sini.
+// Namun, untuk memastikan kode ini berfungsi jika CustomHeader tidak diimpor,
+// saya sertakan definisinya di bagian bawah.
 class CustomHeader extends StatelessWidget {
   const CustomHeader({super.key});
 
@@ -162,7 +186,10 @@ class CustomHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.book, color: Colors.white),
+          const Icon(
+            Icons.book,
+            color: Colors.white,
+          ), // Ganti dengan Image.asset('assets/logo.png') jika ada
           const SizedBox(width: 8),
           const Text(
             'Farastika Allistio\nLaper\'in Cathering',
@@ -171,11 +198,17 @@ class CustomHeader extends StatelessWidget {
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.home, color: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              // TODO: Navigasi ke HomePage atau Beranda
+              // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+            },
           ),
           IconButton(
             icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              // TODO: Navigasi ke halaman Menu
+              // Navigator.push(context, MaterialPageRoute(builder: (context) => const MenuPage()));
+            },
           ),
         ],
       ),

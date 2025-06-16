@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'register_page.dart'; // Import RegisterPage
+import 'login_page.dart'; // Import LoginPage (asumsi nama file dan kelas)
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -8,9 +10,12 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
+          // Asumsi 'assets/background.png' adalah gambar latar belakang
           image: DecorationImage(
             image: AssetImage('assets/background.png'),
             fit: BoxFit.cover,
+            // Anda bisa menambahkan errorBuilder di sini juga untuk fallback gambar
+            // errorBuilder: (context, error, stackTrace) => Container(color: Colors.blueGrey),
           ),
         ),
         child: SafeArea(
@@ -23,16 +28,24 @@ class HomePage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color:
+                        Colors
+                            .white, // Pastikan teks terlihat di latar belakang
                   ),
                 ),
                 const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/login');
+                    // Navigasi ke LoginPage menggunakan MaterialPageRoute
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Colors.blue, // Warna sesuai keinginan
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 32,
@@ -42,12 +55,23 @@ class HomePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text('Login'),
+                  child: const Text(
+                    'Login',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ), // Tambahkan ukuran font untuk konsistensi
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/register');
+                    // Navigasi ke RegisterPage menggunakan MaterialPageRoute
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RegisterPage(),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -60,7 +84,12 @@ class HomePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  child: const Text('Register'),
+                  child: const Text(
+                    'Register',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ), // Tambahkan ukuran font untuk konsistensi
+                  ),
                 ),
               ],
             ),

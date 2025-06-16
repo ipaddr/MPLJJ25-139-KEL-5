@@ -1,20 +1,49 @@
-import 'package:bento_buddy/jasa_catering.dart';
-import 'package:flutter/material.dart'; // Pastikan import halaman tujuan
+import 'package:flutter/material.dart';
+import 'beranda.dart'; // Import Beranda, karena setelah login akan diarahkan ke sana
+import 'register_page.dart'; // Import RegisterPage
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final usernameController = TextEditingController();
-    final passwordController = TextEditingController();
+  State<LoginPage> createState() => _LoginPageState();
+}
 
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  // Pastikan untuk membuang controller saat widget dihapus
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  // Helper method untuk konsistensi gaya InputDecoration
+  InputDecoration _inputDecoration(String hintText) {
+    return InputDecoration(
+      hintText: hintText,
+      filled: true,
+      fillColor: Colors.grey.shade300,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      hintStyle: const TextStyle(color: Colors.grey), // Gaya untuk hint text
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/background.png'),
+            image: AssetImage('assets/background.png'), // Pastikan aset ini ada
             fit: BoxFit.cover,
           ),
         ),
@@ -23,7 +52,9 @@ class LoginPage extends StatelessWidget {
             width: 300,
             padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.85),
+              color: Colors.white.withOpacity(
+                0.85,
+              ), // Fix: Menggunakan .withOpacity()
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -35,18 +66,24 @@ class LoginPage extends StatelessWidget {
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     decoration: TextDecoration.underline,
+                    color: Color.fromARGB(
+                      255,
+                      49,
+                      43,
+                      43,
+                    ), // Warna judul LOGIN (hitam/gelap)
                   ),
                 ),
                 const SizedBox(height: 24),
 
-                // Username
+                // Username TextField
                 TextField(
                   controller: usernameController,
                   decoration: _inputDecoration('Username'),
                 ),
                 const SizedBox(height: 16),
 
-                // Password
+                // Password TextField
                 TextField(
                   controller: passwordController,
                   obscureText: true,
@@ -63,11 +100,13 @@ class LoginPage extends StatelessWidget {
                       final password = passwordController.text;
 
                       if (username.isNotEmpty && password.isNotEmpty) {
-                        // ✅ Navigasi ke halaman berikutnya
+                        // ✅ Navigasi ke halaman Beranda
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const JasaCateringPage(),
+                            builder:
+                                (context) =>
+                                    const Beranda(), // Mengarahkan ke Beranda
                           ),
                         );
                       } else {
@@ -80,17 +119,44 @@ class LoginPage extends StatelessWidget {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade700,
+                      backgroundColor: const Color(
+                        0xFF1E2378,
+                      ), // Warna background tombol (biru tua)
+                      foregroundColor:
+                          Colors.white, // Warna teks tombol menjadi putih
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 10,
                       ),
-                      child: Text('Login'),
+                    ),
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ), // Tambahkan bold agar lebih terlihat
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16), // Spasi di bawah tombol login
+                // Tombol "Daftar Sekarang"
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RegisterPage(),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    'Belum punya akun? Daftar Sekarang',
+                    style: TextStyle(
+                      color: Colors.blueAccent, // Warna link
+                      fontSize: 14,
                     ),
                   ),
                 ),
@@ -98,19 +164,6 @@ class LoginPage extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  static InputDecoration _inputDecoration(String hintText) {
-    return InputDecoration(
-      hintText: hintText,
-      filled: true,
-      fillColor: Colors.grey.shade300,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
       ),
     );
   }

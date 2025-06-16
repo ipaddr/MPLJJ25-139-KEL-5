@@ -129,7 +129,7 @@ class _LaporanPageState extends State<LaporanPage> {
                           // TODO: Kirim logic
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey.shade700,
+                          backgroundColor: const Color.fromARGB(255, 19, 3, 71),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),

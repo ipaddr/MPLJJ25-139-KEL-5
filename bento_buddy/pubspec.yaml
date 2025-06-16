@@ -37,9 +37,18 @@ flutter:
   - assets/ajukan.png
   - assets/laporan.png
   - assets/profil.png
-  - assets/logosdn.png
-  - assets/logosmp.png
-  - assets/logosma.png
+  - assets/lokasi.png
+  - assets/location.png
+  - assets/laporan.png
   - assets/laper.png
   - assets/ondemande.png
   - assets/sekolah.png
+  - assets/menu_laperin.png
+  - assets/menu_anande.png
+  - assets/menu_deluna.png
+  - assets/menu_ondemande.png
+  - assets/menu_goldencity.png
+  - assets/ondemande.png
+  - assets/gedung.png
+  - assets/calendar.png
+  - assets/bento.png

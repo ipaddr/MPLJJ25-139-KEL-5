@@ -4,16 +4,8 @@ import 'nerimabantuan.dart'; // Sudah benar
 import 'blmnerimabantuan.dart';
 import 'jasa_catering.dart';
 import 'pengajuanpage.dart'; // asumsi ada PengajuanSekolahPage
-import 'laporan.dart'; // asumsi ada LaporanPage
+import 'menu_hari_ini.dart'; // asumsi ada LaporanPage
 import 'profil.dart'; // asumsi ada ProfilPage
-
-// Import CustomHeader dari beranda.dart (atau lokasi aslinya jika sudah terpisah)
-// Agar CustomHeader konsisten di seluruh aplikasi, idealnya ditempatkan di file terpisah
-// yang dapat diimpor oleh semua halaman. Untuk saat ini, saya akan mengimpornya.
-// Jika CustomHeader belum terpisah, pastikan Anda memisahkan CustomHeader dari beranda.dart
-// ke file baru (misalnya custom_header.dart) dan import di sini.
-// Untuk tujuan ini, saya akan menggunakan nama CustomHeaderApp sebagai pembeda
-// jika ada CustomHeader lain di proyek Anda.
 import 'beranda.dart'; // Mengimpor CustomHeaderBeranda dari beranda.dart (asumsi nama CustomHeader di beranda.dart adalah CustomHeaderBeranda)
 
 class Menu extends StatelessWidget {
@@ -108,9 +100,9 @@ class Menu extends StatelessWidget {
                   _buildMenuItem(
                     context,
                     'assets/laporan.png', // Pastikan aset ini ada
-                    'Laporan',
+                    'Menu',
                     // Pastikan LaporanPage ada di laporan.dart
-                    const LaporanPage(),
+                    const MenuHariIni(),
                   ),
                   _buildMenuItem(
                     context,

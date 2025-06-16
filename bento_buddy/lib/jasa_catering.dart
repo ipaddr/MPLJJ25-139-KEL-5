@@ -35,27 +35,27 @@ class _JasaCateringPageState extends State<JasaCateringPage> {
       ),
       CateringData(
         nama: 'Anande Catering',
-        logoAssetPath: 'assets/anande.png',
+        logoAssetPath: 'assets/laper.png',
       ), // Asumsi nama file
       CateringData(
         nama: 'DeLuna Catering',
-        logoAssetPath: 'assets/deluna.png',
+        logoAssetPath: 'assets/laper.png',
       ), // Asumsi nama file
       CateringData(
         nama: 'OndeMande Catering',
-        logoAssetPath: 'assets/ondemande.png',
+        logoAssetPath: 'assets/laper.png',
       ),
       CateringData(
         nama: 'Golden City Catering',
-        logoAssetPath: 'assets/goldencity.png',
+        logoAssetPath: 'assets/laper.png',
       ), // Asumsi nama file
       CateringData(
         nama: 'Rabu\'s Catering',
-        logoAssetPath: 'assets/rabus.png',
+        logoAssetPath: 'assets/laper.png',
       ), // Asumsi nama file
       CateringData(
         nama: 'Lezato Catering',
-        logoAssetPath: 'assets/lezato.png',
+        logoAssetPath: 'assets/laper.png',
       ), // Asumsi nama file
     ];
     hasilPencarian = semuaCatering;
