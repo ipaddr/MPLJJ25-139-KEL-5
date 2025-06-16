@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 // Import halaman-halaman tujuan
-import 'nerimabantuan.dart'; // Sudah benar
+import 'nerimabantuan.dart';
 import 'blmnerimabantuan.dart';
 import 'jasa_catering.dart';
 import 'pengajuanpage.dart'; // asumsi ada PengajuanSekolahPage
-import 'menu_hari_ini.dart'; // asumsi ada LaporanPage
+import 'menu_hari_ini.dart'; // asumsi ada MenuHariIni
 import 'profil.dart'; // asumsi ada ProfilPage
-import 'beranda.dart'; // Mengimpor CustomHeaderBeranda dari beranda.dart (asumsi nama CustomHeader di beranda.dart adalah CustomHeaderBeranda)
+import 'login_page.dart'; // Import LoginPage untuk navigasi logout
 
 class Menu extends StatelessWidget {
   const Menu({super.key});
@@ -14,42 +14,49 @@ class Menu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.grey[100], // Warna latar belakang keseluruhan
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1B1464),
-        toolbarHeight: 80,
+        backgroundColor: const Color(0xFF1B1464), // Warna AppBar
+        toolbarHeight: 80, // Tinggi AppBar
         title: Row(
           children: [
+            // Ikon atau Logo di AppBar
             const Icon(
-              Icons.school,
+              Icons.school, // [Image of School Icon]
               size: 32,
               color: Colors.white,
-            ), // Atau Image.asset('assets/logo.png', width: 32, height: 32)
+            ), // Atau Image.asset('assets/logo.png', width: 32, height: 32) jika menggunakan aset gambar
             const SizedBox(width: 10),
+            // Info pengguna
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 Text(
-                  "Farastika Allistio",
+                  "Farastika Allistio", // [Image of User Name]
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
                 Text(
-                  "Laper'in Cathering",
+                  "Laper'in Cathering", // [Image of Catering Name]
                   style: TextStyle(fontSize: 12, color: Colors.white),
                 ),
               ],
             ),
-            const Spacer(),
-            // Ikon menu di Menu AppBar juga harusnya tidak navigasi kemana-mana atau pop
+            const Spacer(), // Memberikan ruang kosong fleksibel
+            // Ikon menu di AppBar (tetap sebagai ikon menu, bisa pop jika ingin menutup menu)
             IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white),
+              icon: const Icon(
+                Icons.menu,
+                color: Colors.white,
+              ), // [Image of Menu Icon]
               onPressed: () {
                 // Di halaman menu, menekan ikon menu bisa jadi untuk menutup menu
                 // atau tidak melakukan apa-apa.
                 // Jika menu ini adalah root dari navigasi, Anda mungkin ingin pop.
                 // Jika ini adalah halaman yang bisa diakses dari berbagai tempat,
                 // maka Navigator.pop() akan membawa kembali ke halaman sebelumnya.
-                Navigator.pop(context); // Kembali ke halaman sebelumnya
+                Navigator.pop(
+                  context,
+                ); // Kembali ke halaman sebelumnya / menutup menu
               },
             ),
           ],
@@ -59,54 +66,54 @@ class Menu extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 20), // Spasi vertikal
             const Text(
-              'Mau cari apa?',
+              'Mau cari apa?', // [Image of Question Text]
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 24),
-
+            const SizedBox(height: 24), // Spasi vertikal
+            // Grid menu item
             Expanded(
               child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 24,
-                mainAxisSpacing: 24,
+                crossAxisCount: 2, // 2 kolom
+                crossAxisSpacing: 24, // Spasi horizontal antar item
+                mainAxisSpacing: 24, // Spasi vertikal antar item
                 children: [
                   _buildMenuItem(
                     context,
-                    'assets/menerima.png', // Pastikan aset ini ada
+                    'assets/menerima.png', // [Image of Menerima Bantuan Icon]
                     'Menerima Bantuan',
                     const DataSekolahPage(), // Navigasi ke DataSekolahPage
                   ),
                   _buildMenuItem(
                     context,
-                    'assets/belum_menerima.png', // Pastikan aset ini ada
+                    'assets/belum_menerima.png', // [Image of Belum Menerima Bantuan Icon]
                     'Belum Menerima Bantuan',
                     const Blmnerimabantuan(),
                   ),
                   _buildMenuItem(
                     context,
-                    'assets/cathering.png', // Pastikan aset ini ada
+                    'assets/cathering.png', // [Image of Cathering Icon]
                     'Cathering',
                     const JasaCateringPage(),
                   ),
                   _buildMenuItem(
                     context,
-                    'assets/ajukan.png', // Pastikan aset ini ada
+                    'assets/ajukan.png', // [Image of Ajukan Sekolah Icon]
                     'Ajukan Sekolah',
                     // Pastikan PengajuanSekolahPage ada di pengajuanpage.dart
                     const PengajuanSekolahPage(),
                   ),
                   _buildMenuItem(
                     context,
-                    'assets/laporan.png', // Pastikan aset ini ada
-                    'Menu',
-                    // Pastikan LaporanPage ada di laporan.dart
+                    'assets/laporan.png', // [Image of Laporan Icon]
+                    'Menu', // Label diubah menjadi "Menu" sesuai gambar sebelumnya
+                    // Pastikan MenuHariIni ada di menu_hari_ini.dart
                     const MenuHariIni(),
                   ),
                   _buildMenuItem(
                     context,
-                    'assets/profil.png', // Pastikan aset ini ada
+                    'assets/profil.png', // [Image of Profil Icon]
                     'Profil',
                     // Pastikan ProfilPage ada di profil.dart
                     const ProfilPage(),
@@ -115,51 +122,47 @@ class Menu extends StatelessWidget {
               ),
             ),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Kembali ke halaman sebelumnya
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1B1464),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Text('Kembali'),
-                  ),
+            // Tombol Logout (Tombol Kembali telah dihapus)
+            const SizedBox(height: 16), // Spasi sebelum tombol logout
+            ElevatedButton(
+              onPressed: () {
+                // Logika Logout: Menavigasi ke LoginPage dan menghapus semua rute sebelumnya
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                  (Route<dynamic> route) =>
+                      false, // Menghapus semua rute dari stack
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(
+                  0xFF1B1464,
+                ), // [Image of Logout Button Color]
+                foregroundColor: Colors.white, // Warna teks putih
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12), // Sudut membulat
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    // TODO: implement logout logic
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Logout ditekan!')),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1B1464),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Text('Logout'),
-                  ),
-                ),
-              ],
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 15,
+                ), // Padding tombol
+                minimumSize: const Size(
+                  double.infinity,
+                  50,
+                ), // Lebar penuh dan tinggi tetap
+              ),
+              child: const Text(
+                'Logout', // [Image of Logout Text]
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 16), // Spasi di bagian bawah
           ],
         ),
       ),
     );
   }
 
+  // Helper method untuk membangun setiap item menu
   Widget _buildMenuItem(
     BuildContext context,
     String imagePath,
@@ -181,7 +184,7 @@ class Menu extends StatelessWidget {
             height: 90,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.teal[200], // Warna background lingkaran
+              color: Colors.teal[200], // Warna background lingkaran ikon
             ),
             padding: const EdgeInsets.all(12),
             child: Image.asset(
