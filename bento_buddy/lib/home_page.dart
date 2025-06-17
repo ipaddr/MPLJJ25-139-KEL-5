@@ -117,23 +117,7 @@ class _SchoolCardWidget extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  sekolah.logoPath ?? 'assets/school_building.png',
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      'assets/school_building.png',
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                    );
-                  },
-                ),
-              ),
+              ClipRRect(borderRadius: BorderRadius.circular(8)),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
