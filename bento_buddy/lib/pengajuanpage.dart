@@ -10,7 +10,7 @@ import 'package:bento_buddy/menu.dart'; // Import menu.dart jika header memiliki
 // CustomHeader yang disatukan langsung ke dalam file pengajuanpage.dart
 class CustomHeader extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback
-  onMenuPressed; // Tetap diperlukan jika ada tombol menu di header
+      onMenuPressed; // Tetap diperlukan jika ada tombol menu di header
   final String? userName;
   final String? userRoleDisplay;
   final String? userInstitutionName;
@@ -87,58 +87,10 @@ class _CustomHeaderState extends State<CustomHeader> {
             IconButton(
               icon: const Icon(Icons.menu, color: Colors.white),
               onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return SafeArea(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          ListTile(
-                            leading: const Icon(Icons.home),
-                            title: const Text('Beranda'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              // Karena ini halaman Pengajuan, navigasi ke HomePage setelah dari bottom sheet
-                              // Memerlukan import home_page.dart di file ini.
-                              // Atau jika HomePage adalah rute utama setelah login, cukup pop all.
-                              Navigator.of(context).popUntil(
-                                (route) => route.isFirst,
-                              ); // Kembali ke halaman utama (asumsi HomePage)
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.restaurant_menu),
-                            title: const Text('Menu Hari Ini'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const Menu(),
-                                ),
-                              );
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.logout),
-                            title: const Text('Logout'),
-                            onTap: () async {
-                              Navigator.pop(context);
-                              final AuthService authService = AuthService();
-                              await authService.signOut();
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginPage(),
-                                ),
-                                (Route<dynamic> route) => false,
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                // Menavigasi langsung ke halaman Menu.dart
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Menu()),
                 );
               },
             ),
@@ -329,10 +281,9 @@ class _PengajuanSekolahPageState extends State<PengajuanSekolahPage> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
-                    onPressed:
-                        () => Navigator.pop(
-                          context,
-                        ), // Kembali ke halaman sebelumnya
+                    onPressed: () => Navigator.pop(
+                      context,
+                    ), // Kembali ke halaman sebelumnya
                   ),
                   const SizedBox(width: 8),
                   const Text(

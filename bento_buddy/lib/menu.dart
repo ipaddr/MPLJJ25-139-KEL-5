@@ -1,15 +1,67 @@
+import 'package:bento_buddy/blmnerimabantuan.dart';
+import 'package:bento_buddy/menu_hari_ini.dart';
+import 'package:bento_buddy/nerimabantuan.dart';
+import 'package:bento_buddy/pengajuanpage.dart';
+import 'package:bento_buddy/profil.dart';
 import 'package:flutter/material.dart';
-// Import halaman-halaman tujuan
-import 'nerimabantuan.dart';
-import 'blmnerimabantuan.dart';
-import 'jasa_catering.dart';
-import 'pengajuanpage.dart'; // asumsi ada PengajuanSekolahPage
-import 'menu_hari_ini.dart'; // asumsi ada MenuHariIni
-import 'profil.dart'; // asumsi ada ProfilPage
-import 'login_page.dart'; // Import LoginPage untuk navigasi logout
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:bento_buddy/pengelola_pengajuan_page.dart'; // Import halaman pengelola pengajuan
+import 'package:bento_buddy/login_page.dart'; // Import LoginPage
+import 'package:bento_buddy/services/auth_service.dart'; // Import AuthService
 
-class Menu extends StatelessWidget {
+class Menu extends StatefulWidget {
   const Menu({super.key});
+
+  @override
+  State<Menu> createState() => _MenuState();
+}
+
+class _MenuState extends State<Menu> {
+  String? _userName;
+  String? _userRole; // Untuk menyimpan peran pengguna
+  String? _userRoleDisplay;
+  String? _userInstitutionName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData(); // Memuat data pengguna untuk header dan peran
+  }
+
+  Future<void> _loadUserData() async {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+      if (userDoc.exists) {
+        final data = userDoc.data() as Map<String, dynamic>;
+        setState(() {
+          _userName = data['name'];
+          _userRole = data['role'];
+          _userInstitutionName = data['institutionName'];
+          switch (_userRole) {
+            case 'school':
+              _userRoleDisplay = 'Admin Sekolah';
+              break;
+            case 'catering':
+              _userRoleDisplay = 'Admin Catering';
+              break;
+            case 'funder':
+              _userRoleDisplay = 'Admin Pemerintah';
+              break;
+            case 'general':
+              _userRoleDisplay = 'Umum';
+              break;
+            default:
+              _userRoleDisplay = 'Pengguna';
+          }
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,23 +73,30 @@ class Menu extends StatelessWidget {
         title: Row(
           children: [
             // Ikon atau Logo di AppBar
-            const Icon(
-              Icons.school, // [Image of School Icon]
-              size: 32,
-              color: Colors.white,
-            ), // Atau Image.asset('assets/logo.png', width: 32, height: 32) jika menggunakan aset gambar
+            Image.asset(
+              'assets/logo.png', // [Image of Logo Aplikasi]
+              height: 50,
+              width: 50,
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.school,
+                color: Colors.white,
+                size: 50,
+              ), // Fallback
+            ),
             const SizedBox(width: 10),
             // Info pengguna
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  "Farastika Allistio", // [Image of User Name]
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  _userName ?? "Pengguna", // Nama pengguna dinamis
+                  style: const TextStyle(fontSize: 16, color: Colors.white),
                 ),
                 Text(
-                  "Laper'in Cathering", // [Image of Catering Name]
-                  style: TextStyle(fontSize: 12, color: Colors.white),
+                  _userInstitutionName ??
+                      _userRoleDisplay ??
+                      "BentoBuddy User", // Instansi atau peran dinamis
+                  style: const TextStyle(fontSize: 12, color: Colors.white),
                 ),
               ],
             ),
@@ -47,16 +106,10 @@ class Menu extends StatelessWidget {
               icon: const Icon(
                 Icons.menu,
                 color: Colors.white,
-              ), // [Image of Menu Icon]
+              ),
               onPressed: () {
-                // Di halaman menu, menekan ikon menu bisa jadi untuk menutup menu
-                // atau tidak melakukan apa-apa.
-                // Jika menu ini adalah root dari navigasi, Anda mungkin ingin pop.
-                // Jika ini adalah halaman yang bisa diakses dari berbagai tempat,
-                // maka Navigator.pop() akan membawa kembali ke halaman sebelumnya.
                 Navigator.pop(
-                  context,
-                ); // Kembali ke halaman sebelumnya / menutup menu
+                    context); // Kembali ke halaman sebelumnya / menutup menu
               },
             ),
           ],
@@ -84,54 +137,73 @@ class Menu extends StatelessWidget {
                     'assets/menerima.png', // [Image of Menerima Bantuan Icon]
                     'Menerima Bantuan',
                     const DataSekolahPage(), // Navigasi ke DataSekolahPage
+                    // Hanya tampilkan jika peran adalah funder atau sekolah
+                    // _userRole == 'funder' || _userRole == 'school'
                   ),
                   _buildMenuItem(
                     context,
                     'assets/belum_menerima.png', // [Image of Belum Menerima Bantuan Icon]
                     'Belum Menerima Bantuan',
                     const Blmnerimabantuan(),
+                    // Hanya tampilkan jika peran adalah funder atau sekolah
+                    // _userRole == 'funder' || _userRole == 'school'
                   ),
                   _buildMenuItem(
                     context,
-                    'assets/cathering.png', // [Image of Cathering Icon]
-                    'Cathering',
-                    const JasaCateringPage(),
+                    'assets/Cathering.png', // [Image of Cathering Icon]
+                    'Konfirmasi Bantuan', // Mengarahkan ke PengelolaPengajuanPage
+                    const PengelolaPengajuanPage(),
+                    // Hanya tampilkan jika peran adalah funder
+                    // _userRole == 'funder'
                   ),
                   _buildMenuItem(
                     context,
                     'assets/ajukan.png', // [Image of Ajukan Sekolah Icon]
                     'Ajukan Sekolah',
-                    // Pastikan PengajuanSekolahPage ada di pengajuanpage.dart
-                    const PengajuanSekolahPage(),
+                    const PengajuanSekolahPage(), // Navigasi ke PengajuanSekolahPage
+                    // Hanya tampilkan jika peran adalah school atau general
+                    // _userRole == 'school' || _userRole == 'general'
                   ),
                   _buildMenuItem(
                     context,
                     'assets/laporan.png', // [Image of Laporan Icon]
                     'Menu', // Label diubah menjadi "Menu" sesuai gambar sebelumnya
-                    // Pastikan MenuHariIni ada di menu_hari_ini.dart
-                    const MenuHariIni(),
+                    const MenuHariIni(), // Navigasi ke MenuHariIni
+                    // Semua peran dapat melihat menu hari ini
+                    // _userRole != null
                   ),
                   _buildMenuItem(
                     context,
                     'assets/profil.png', // [Image of Profil Icon]
                     'Profil',
-                    // Pastikan ProfilPage ada di profil.dart
-                    const ProfilPage(),
+                    const ProfilPage(), // Navigasi ke ProfilPage
+                    // Semua peran dapat melihat profil
+                    // _userRole != null
                   ),
                 ],
               ),
             ),
-
             // Tombol Logout (Tombol Kembali telah dihapus)
             const SizedBox(height: 16), // Spasi sebelum tombol logout
             ElevatedButton(
-              onPressed: () {
-                // Logika Logout: Menavigasi ke LoginPage dan menghapus semua rute sebelumnya
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                  (Route<dynamic> route) =>
-                      false, // Menghapus semua rute dari stack
-                );
+              onPressed: () async {
+                print('Logout button pressed.');
+                final AuthService authService = AuthService();
+                try {
+                  print('Attempting to sign out...');
+                  await authService.signOut();
+                  print('Sign out successful.');
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    (Route<dynamic> route) => false,
+                  );
+                  print('Navigated to Login Page.');
+                } catch (e) {
+                  print('Error during sign out: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Gagal logout: $e')),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(
@@ -168,7 +240,12 @@ class Menu extends StatelessWidget {
     String imagePath,
     String label,
     Widget destination,
+    // Tambahkan parameter `bool isVisible` jika Anda ingin mengontrol visibilitas berdasarkan peran
+    // bool isVisible,
   ) {
+    // if (!isVisible) {
+    //   return const SizedBox.shrink(); // Sembunyikan item jika tidak terlihat
+    // }
     return InkWell(
       onTap: () {
         Navigator.push(

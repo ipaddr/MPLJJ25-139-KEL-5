@@ -20,7 +20,7 @@ class Sekolah {
   final String? kontakSekolah;
   final String? emailSekolah;
   final String?
-  totalDanaBantuan; // Misal dari field di Firestore 'totalFinancialAid'
+      totalDanaBantuan; // Misal dari field di Firestore 'totalFinancialAid'
 
   Sekolah({
     required this.id,
@@ -75,10 +75,9 @@ class Sekolah {
       kepalaSekolah: data['kepalaSekolah'] ?? 'Tidak Tersedia',
       kontakSekolah: data['kontakSekolah'] ?? 'Tidak Tersedia',
       emailSekolah: data['emailSekolah'] ?? 'Tidak Tersedia',
-      totalDanaBantuan:
-          data['totalDanaBantuan'] != null
-              ? 'Rp. ${NumberFormat("#,##0", "id_ID").format(data['totalDanaBantuan'])} / Bulan'
-              : 'Tidak Tersedia',
+      totalDanaBantuan: data['totalDanaBantuan'] != null
+          ? 'Rp. ${NumberFormat("#,##0", "id_ID").format(data['totalDanaBantuan'])} / Bulan'
+          : 'Tidak Tersedia',
     );
   }
 }
@@ -261,7 +260,7 @@ class SekolahPage extends StatelessWidget {
               _buildCateringCard(
                 context,
                 sekolahData.logoPath ??
-                    'assets/school_building.png', // Gunakan logo sekolah atau fallback untuk catering card
+                    'assets/ajukan.png', // Gunakan logo sekolah atau fallback untuk catering card
                 sekolahData.cateringName!, // Nama catering dari data dinamis
                 sekolahData
                     .alamat, // Alamat sekolah untuk catering (jika tidak ada alamat spesifik catering)

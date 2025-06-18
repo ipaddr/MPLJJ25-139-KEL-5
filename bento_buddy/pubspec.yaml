@@ -5,17 +5,19 @@ publish_to: "none" # Hapus baris ini jika ingin dipublikasikan ke pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.2
+  sdk: ^3.6.2
 
 dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  flutter_native_splash: ^2.4.6
+  flutter_native_splash: ^2.4.4
   firebase_core: ^3.14.0
   firebase_auth: ^5.6.0
   cloud_firestore: ^5.6.9
   intl: ^0.20.2
+  firebase_storage: ^12.4.7
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
@@ -26,33 +28,33 @@ flutter:
   uses-material-design: true
 
   assets:
-  - assets/logosdn.png
-  - assets/logosmp.png
-  - assets/logosma.png
-  - assets/logo.png
-  - assets/background.png
-  - assets/school.png
-  - assets/location.png
-  - assets/bento.png
-  - assets/calendar.png
-  - assets/belum_menerima.png
-  - assets/menerima.png
-  - assets/Cathering.png
-  - assets/ajukan.png
-  - assets/laporan.png
-  - assets/profil.png
-  - assets/lokasi.png
-  - assets/location.png
-  - assets/laporan.png
-  - assets/laper.png
-  - assets/ondemande.png
-  - assets/sekolah.png
-  - assets/menu_laperin.png
-  - assets/menu_anande.png
-  - assets/menu_deluna.png
-  - assets/menu_ondemande.png
-  - assets/menu_goldencity.png
-  - assets/ondemande.png
-  - assets/gedung.png
-  - assets/calendar.png
-  - assets/bento.png
+    - assets/logosdn.png
+    - assets/logosmp.png
+    - assets/logosma.png
+    - assets/logo.png
+    - assets/background.png
+    - assets/school.png
+    - assets/location.png
+    - assets/bento.png
+    - assets/calendar.png
+    - assets/belum_menerima.png
+    - assets/menerima.png
+    - assets/Cathering.png
+    - assets/ajukan.png
+    - assets/laporan.png
+    - assets/profil.png
+    - assets/lokasi.png
+    - assets/location.png
+    - assets/laporan.png
+    - assets/laper.png
+    - assets/ondemande.png
+    - assets/sekolah.png
+    - assets/menu_laperin.png
+    - assets/menu_anande.png
+    - assets/menu_deluna.png
+    - assets/menu_ondemande.png
+    - assets/menu_goldencity.png
+    - assets/ondemande.png
+    - assets/gedung.png
+    - assets/calendar.png
+    - assets/bento.png

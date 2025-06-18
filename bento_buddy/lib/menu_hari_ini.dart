@@ -1,20 +1,160 @@
 import 'package:flutter/material.dart';
-import 'menu.dart'; // Import halaman menu untuk navigasi ke sana
-import 'upload_menu.dart'; // Asumsikan ada file ini untuk halaman upload menu
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Cloud Firestore
+import 'package:intl/intl.dart'; // Import untuk format tanggal
+import 'package:bento_buddy/menu.dart'; // Import halaman menu untuk navigasi ke sana
+import 'package:bento_buddy/upload_menu.dart'; // Asumsikan ada file ini untuk halaman upload menu
+import 'package:bento_buddy/menu_data.dart'; // Import model MenuData yang baru
+import 'package:bento_buddy/login_page.dart'; // Import LoginPage untuk navigasi logout
+import 'package:bento_buddy/services/auth_service.dart'; // Import AuthService untuk logout
 
-// Asumsi model CateringMenu sudah ada atau didefinisikan di sini
-class CateringMenu {
-  final String cateringName;
-  final String menuName;
-  final String description;
-  final String imagePath; // Path ke aset gambar menu
+// Definisi CustomHeader lokal untuk halaman ini
+// Jika Anda memiliki CustomHeader yang dapat digunakan kembali secara universal,
+// sebaiknya impor dari sana daripada mendefinisikannya di sini.
+class _CustomHeaderForMenu extends StatefulWidget
+    implements PreferredSizeWidget {
+  final VoidCallback onMenuPressed;
+  final VoidCallback onBackPressed;
+  final String? userName;
+  final String? userRoleDisplay;
+  final String? userInstitutionName;
 
-  const CateringMenu({
-    required this.cateringName,
-    required this.menuName,
-    required this.description,
-    required this.imagePath,
+  const _CustomHeaderForMenu({
+    required this.onMenuPressed,
+    required this.onBackPressed,
+    this.userName,
+    this.userRoleDisplay,
+    this.userInstitutionName,
   });
+
+  @override
+  State<_CustomHeaderForMenu> createState() => _CustomHeaderForMenuState();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(100.0);
+}
+
+class _CustomHeaderForMenuState extends State<_CustomHeaderForMenu> {
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      automaticallyImplyLeading: false, // Hapus tombol back default dari AppBar
+      backgroundColor: const Color(0xFF271A5A), // Warna AppBar sesuai gambar
+      toolbarHeight:
+          widget.preferredSize.height, // Menggunakan tinggi yang disesuaikan
+      flexibleSpace: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, left: 16.0, right: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Logo aplikasi dan info user
+                  Row(
+                    children: [
+                      Image.asset(
+                        'assets/logo.png', // [Image of Logo Aplikasi]
+                        height: 50,
+                        width: 50,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(
+                          Icons.restaurant,
+                          color: Colors.white,
+                          size: 50,
+                        ), // Fallback
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.userName ??
+                                'Pengguna', // Nama pengguna dinamis
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            widget.userInstitutionName ??
+                                widget.userRoleDisplay ??
+                                'BentoBuddy User', // Instansi atau peran dinamis
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  // Ikon menu
+                  IconButton(
+                    icon: const Icon(Icons.menu, color: Colors.white),
+                    onPressed: () {
+                      // Menavigasi langsung ke halaman Menu.dart
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Menu()),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10), // Spasi di bawah info user
+            // Baris kedua AppBar: Tombol kembali, judul "Menu Hari Ini", dan "Upload Menu"
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: widget
+                        .onBackPressed, // Memanggil callback onBackPressed
+                    child: const Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: Text(
+                      'Menu Hari Ini',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  // Bagian "Upload Menu"
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const UploadMenuPage()),
+                      );
+                    },
+                    child: const Text(
+                      'Upload Menu',
+                      style: TextStyle(
+                        color: Colors.blueAccent,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class MenuHariIni extends StatefulWidget {
@@ -26,83 +166,87 @@ class MenuHariIni extends StatefulWidget {
 
 class _MenuHariIniState extends State<MenuHariIni> {
   final TextEditingController _searchController = TextEditingController();
-  List<CateringMenu> semuaMenu = [];
-  List<CateringMenu> hasilPencarianMenu = [];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  List<MenuData> _allMenusData = []; // Menggunakan model MenuData
+  List<MenuData> _filteredMenusData = [];
+  Map<String, String> _cateringsMap =
+      {}; // Mungkin tidak diperlukan lagi jika menuData sudah ada cateringName
+
+  String? _userName;
+  String? _userRoleDisplay;
+  String? _userInstitutionName;
 
   @override
   void initState() {
     super.initState();
-    // Data dummy untuk menu hari ini, sesuai gambar
-    semuaMenu = const [
-      CateringMenu(
-        cateringName: 'Laper\'in Cathering',
-        menuName: 'Nasi Uduk Ayam Bumbu',
-        description:
-            'Nasi uduk kaya rempah dengan toping ayam bumbu dengan taburan yang kaya gizi',
-        imagePath: 'assets/menu_laperin.png', // [Image of Nasi Uduk Ayam Bumbu]
-      ),
-      CateringMenu(
-        cateringName: 'Anande Cathering',
-        menuName: 'Ayam Balado',
-        description:
-            'Ayam kampung goreng balado, sayur kangkung, dan tahu tempe goreng',
-        imagePath: 'assets/menu_anande.png', // [Image of Ayam Balado]
-      ),
-      CateringMenu(
-        cateringName: 'Anande Cathering', // Tambahan menu untuk Anande
-        menuName: 'Senghong tahu goreng',
-        description: 'Variasi tahu goreng dengan bumbu khas',
-        imagePath: 'assets/menu_anande2.png', // Ganti dengan aset yang sesuai
-      ),
-      CateringMenu(
-        cateringName: 'DeLuna Cathering',
-        menuName: 'Sop Daging Rumput laut',
-        description:
-            'Sop dengan potongan daging sapi yang empuk dan rumput laut yang menyegarkan dan sehat',
-        imagePath:
-            'assets/menu_deluna.png', // [Image of Sop Daging Rumput Laut]
-      ),
-      CateringMenu(
-        cateringName: 'OndeMande Cathering',
-        menuName: 'Ikan Bakar Sambal Matah',
-        description:
-            'Ikan laut panggang dengan rempah khas minang dipadukan dengan sambal matah, menghasilkan cita rasa yang menggugah selera',
-        imagePath:
-            'assets/menu_ondemande.png', // [Image of Ikan Bakar Sambal Matah]
-      ),
-      CateringMenu(
-        cateringName: 'OndeMande Cathering', // Tambahan menu untuk OndeMande
-        menuName: 'Kangkungan rempah khas minang',
-        description:
-            'Kangkungan rempah khas minang dipadukan dengan sarba ratah',
-        imagePath:
-            'assets/menu_ondemande2.png', // Ganti dengan aset yang sesuai
-      ),
-      CateringMenu(
-        cateringName: 'Golden City Cathering',
-        menuName: 'Dadar Geprek Sambal kecap',
-        description:
-            'Telur dadar yang dimasak dengan tepung bumbu, disajikan dengan sambal kecap dengan irisan cabe dan rempah rahasia',
-        imagePath:
-            'assets/menu_goldencity.png', // [Image of Dadar Geprek Sambal Kecap]
-      ),
-    ];
-    hasilPencarianMenu = semuaMenu;
+    _loadInitialData();
     _searchController.addListener(_filterMenu);
+  }
+
+  Future<void> _loadInitialData() async {
+    // Memuat data pengguna untuk header
+    User? currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(currentUser.uid).get();
+      if (userDoc.exists) {
+        final data = userDoc.data() as Map<String, dynamic>;
+        setState(() {
+          _userName = data['name'];
+          _userInstitutionName = data['institutionName'];
+          _userRoleDisplay = _mapRoleToDisplay(data['role']);
+        });
+      }
+    }
+
+    // Mendengarkan perubahan pada koleksi 'menus'
+    _firestore
+        .collection('menus')
+        .orderBy('timestamp',
+            descending: true) // Urutkan berdasarkan waktu upload terbaru
+        .snapshots()
+        .listen((snapshot) {
+      List<MenuData> loadedMenus =
+          snapshot.docs.map((doc) => MenuData.fromFirestore(doc)).toList();
+      setState(() {
+        _allMenusData = loadedMenus;
+        _filterMenu(); // Terapkan filter setelah data dimuat/diperbarui
+      });
+    }, onError: (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading menus: $error')),
+      );
+    });
+  }
+
+  String _mapRoleToDisplay(String role) {
+    switch (role) {
+      case 'school':
+        return 'Admin Sekolah';
+      case 'catering':
+        return 'Admin Catering';
+      case 'funder':
+        return 'Admin Pemerintah';
+      case 'general':
+        return 'Umum';
+      default:
+        return 'Pengguna';
+    }
   }
 
   void _filterMenu() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      hasilPencarianMenu =
-          semuaMenu
-              .where(
-                (menu) =>
-                    menu.menuName.toLowerCase().contains(query) ||
-                    menu.cateringName.toLowerCase().contains(query) ||
-                    menu.description.toLowerCase().contains(query),
-              )
-              .toList();
+      _filteredMenusData = _allMenusData
+          .where(
+            (menu) =>
+                menu.menuName.toLowerCase().contains(query) ||
+                menu.cateringName.toLowerCase().contains(query) ||
+                menu.description.toLowerCase().contains(query),
+          )
+          .toList();
     });
   }
 
@@ -116,141 +260,17 @@ class _MenuHariIniState extends State<MenuHariIni> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100], // Warna latar belakang keseluruhan
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(
-          100.0,
-        ), // Tinggi AppBar yang disesuaikan
-        child: AppBar(
-          automaticallyImplyLeading:
-              false, // Hapus tombol back default dari AppBar
-          backgroundColor: const Color(
-            0xFF271A5A,
-          ), // Warna AppBar sesuai gambar
-          flexibleSpace: SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    top: 8.0,
-                    left: 16.0,
-                    right: 16.0,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Logo aplikasi dan info user
-                      Row(
-                        children: [
-                          Image.asset(
-                            'assets/logo.png', // [Image of Logo Aplikasi]
-                            height: 50,
-                            width: 50,
-                            errorBuilder:
-                                (context, error, stackTrace) => const Icon(
-                                  Icons.restaurant,
-                                  color: Colors.white,
-                                  size: 50,
-                                ), // Fallback
-                          ),
-                          const SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
-                                'Farastika Allistio', // [Image of Farastika Allistio]
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                'Laper\'in Cathering', // [Image of Laper'in Cathering]
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      // Ikon menu
-                      IconButton(
-                        icon: const Icon(
-                          Icons.menu,
-                          color: Colors.white,
-                          size: 30,
-                        ), // [Image of Menu Icon]
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const Menu(),
-                            ), // Navigasi ke halaman Menu
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 10), // Spasi di bawah info user
-                // Baris kedua AppBar: Tombol kembali, judul "Menu Hari Ini", dan "Upload Menu"
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(
-                            context,
-                          ); // Kembali ke halaman sebelumnya
-                        },
-                        child: const Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white,
-                        ), // [Image of Back Arrow]
-                      ),
-                      const SizedBox(width: 10),
-                      const Expanded(
-                        child: Text(
-                          'Menu Hari Ini', // [Image of Menu Hari Ini Title]
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      // Bagian "Upload Menu"
-                      GestureDetector(
-                        onTap: () {
-                          // Navigasi ke halaman upload menu
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const UploadMenuPage(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          'Upload Menu', // [Image of Upload Menu]
-                          style: TextStyle(
-                            color:
-                                Colors
-                                    .blueAccent, // Warna biru seperti di gambar
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600, // Sedikit lebih tebal
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      appBar: _CustomHeaderForMenu(
+        // Menggunakan CustomHeader khusus untuk menu
+        userName: _userName,
+        userRoleDisplay: _userRoleDisplay,
+        userInstitutionName: _userInstitutionName,
+        onMenuPressed: () {
+          // Aksi untuk ikon menu di header (menampilkan bottom sheet)
+        },
+        onBackPressed: () {
+          Navigator.pop(context); // Kembali ke halaman sebelumnya
+        },
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -258,51 +278,53 @@ class _MenuHariIniState extends State<MenuHariIni> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Search bar
-            _buildSearchBar(), // [Image of Search Bar]
+            _buildSearchBar(),
             const SizedBox(height: 16),
             // Daftar menu per katering
             Expanded(
-              child: ListView.builder(
-                itemCount: _getCateringNames(hasilPencarianMenu).length,
-                itemBuilder: (context, index) {
-                  final cateringName =
-                      _getCateringNames(hasilPencarianMenu)[index];
-                  final menusForCatering =
-                      hasilPencarianMenu
-                          .where((menu) => menu.cateringName == cateringName)
-                          .toList();
+              child: _allMenusData.isEmpty && _filteredMenusData.isEmpty
+                  ? const Center(
+                      child: CircularProgressIndicator()) // Tampilkan loading
+                  : ListView.builder(
+                      itemCount: _getCateringNames(_filteredMenusData).length,
+                      itemBuilder: (context, index) {
+                        final cateringName =
+                            _getCateringNames(_filteredMenusData)[index];
+                        final menusForCatering = _filteredMenusData
+                            .where((menu) => menu.cateringName == cateringName)
+                            .toList();
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(
-                          cateringName, // Nama Katering [Image of Catering Name]
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(
-                              0xFF271A5A,
-                            ), // Warna teks judul katering
-                          ),
-                        ),
-                      ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics:
-                            const NeverScrollableScrollPhysics(), // Menonaktifkan scroll ListView internal
-                        itemCount: menusForCatering.length,
-                        itemBuilder: (context, subIndex) {
-                          final menu = menusForCatering[subIndex];
-                          return MenuItemCard(menu: menu);
-                        },
-                      ),
-                      const SizedBox(height: 20), // Spasi antar katering
-                    ],
-                  );
-                },
-              ),
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text(
+                                cateringName, // Nama Katering
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF271A5A),
+                                ),
+                              ),
+                            ),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics:
+                                  const NeverScrollableScrollPhysics(), // Menonaktifkan scroll ListView internal
+                              itemCount: menusForCatering.length,
+                              itemBuilder: (context, subIndex) {
+                                final menu = menusForCatering[subIndex];
+                                return MenuItemCard(
+                                    menu: menu); // Menggunakan MenuItemCard
+                              },
+                            ),
+                            const SizedBox(height: 20), // Spasi antar katering
+                          ],
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -321,10 +343,8 @@ class _MenuHariIniState extends State<MenuHariIni> {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.search,
-            color: Colors.grey,
-          ), // [Image of Search Icon]
+          const Icon(Icons.search,
+              color: Colors.grey), // [Image of Search Icon]
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
@@ -337,10 +357,8 @@ class _MenuHariIniState extends State<MenuHariIni> {
             ),
           ),
           IconButton(
-            icon: const Icon(
-              Icons.filter_list,
-              color: Colors.grey,
-            ), // [Image of Filter Icon]
+            icon: const Icon(Icons.filter_list,
+                color: Colors.grey), // [Image of Filter Icon]
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Filter icon pressed!')),
@@ -352,27 +370,25 @@ class _MenuHariIniState extends State<MenuHariIni> {
     );
   }
 
-  // Helper untuk mendapatkan daftar nama katering unik
-  List<String> _getCateringNames(List<CateringMenu> menus) {
+  // Helper untuk mendapatkan daftar nama katering unik dari MenuData
+  List<String> _getCateringNames(List<MenuData> menus) {
     return menus.map((m) => m.cateringName).toSet().toList();
   }
 }
 
 // Widget untuk menampilkan setiap item menu dalam Card
 class MenuItemCard extends StatelessWidget {
-  final CateringMenu menu;
+  final MenuData menu; // Menggunakan model MenuData
 
   const MenuItemCard({super.key, required this.menu});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(
-        bottom: 12,
-      ), // Margin bawah untuk setiap card
+      margin:
+          const EdgeInsets.only(bottom: 12), // Margin bawah untuk setiap card
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ), // Sudut membulat
+          borderRadius: BorderRadius.circular(10)), // Sudut membulat
       elevation: 1, // Sedikit bayangan
       child: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -381,15 +397,16 @@ class MenuItemCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8), // Sudut gambar membulat
-              child: Image.asset(
-                menu.imagePath, // [Image of Menu Item Image]
+              child: Image.network(
+                // Menggunakan Image.network untuk URL gambar
+                menu.imageUrl, // URL gambar dari MenuData
                 height: 80,
                 width: 80,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(
                     Icons
-                        .broken_image, // Fallback icon jika gambar tidak ditemukan
+                        .broken_image, // Fallback icon jika gambar tidak ditemukan atau gagal dimuat
                     size: 80,
                     color: Colors.grey,
                   );
@@ -404,7 +421,7 @@ class MenuItemCard extends StatelessWidget {
                     CrossAxisAlignment.start, // Penataan kolom ke kiri
                 children: [
                   Text(
-                    menu.menuName, // Nama Menu [Image of Menu Name]
+                    menu.menuName, // Nama Menu
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -413,12 +430,17 @@ class MenuItemCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    menu.description, // Deskripsi Menu [Image of Menu Description]
+                    menu.description, // Deskripsi Menu
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                     maxLines: 3, // Batasi jumlah baris deskripsi
-                    overflow:
-                        TextOverflow
-                            .ellipsis, // Tambahkan "..." jika terlalu panjang
+                    overflow: TextOverflow
+                        .ellipsis, // Tambahkan "..." jika terlalu panjang
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    'Diunggah: ${menu.formattedDate}', // Tanggal unggah
+                    style:
+                        const TextStyle(fontSize: 10, color: Colors.blueGrey),
                   ),
                 ],
               ),
