@@ -4,7 +4,8 @@ import 'package:bento_buddy/splash_screen.dart';
 
 void main() async {
   // Ubah main menjadi async
-  WidgetsFlutterBinding.ensureInitialized(); // Pastikan Flutter binding telah diinisialisasi
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Pastikan Flutter binding telah diinisialisasi
   await Firebase.initializeApp(); // Inisialisasi Firebase
 
   runApp(const BentoBuddy());

@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Cloud Firestore
-import 'package:intl/intl.dart'; // Import untuk format tanggal
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Cloud Firestoreimport 'pack877age:intl/intl.dart'; // Import untuk format tanggal
 import 'package:bento_buddy/menu.dart'; // Import halaman menu untuk navigasi ke sana
 import 'package:bento_buddy/upload_menu.dart'; // Asumsikan ada file ini untuk halaman upload menu
 import 'package:bento_buddy/menu_data.dart'; // Import model MenuData yang baru
-import 'package:bento_buddy/login_page.dart'; // Import LoginPage untuk navigasi logout
-import 'package:bento_buddy/services/auth_service.dart'; // Import AuthService untuk logout
 
 // Definisi CustomHeader lokal untuk halaman ini
-// Jika Anda memiliki CustomHeader yang dapat digunakan kembali secara universal,
-// sebaiknya impor dari sana daripada mendefinisikannya di sini.
 class _CustomHeaderForMenu extends StatefulWidget
     implements PreferredSizeWidget {
   final VoidCallback onMenuPressed;
@@ -18,6 +13,7 @@ class _CustomHeaderForMenu extends StatefulWidget
   final String? userName;
   final String? userRoleDisplay;
   final String? userInstitutionName;
+  final String? userRole; // <-- ADD THIS LINE
 
   const _CustomHeaderForMenu({
     required this.onMenuPressed,
@@ -25,6 +21,7 @@ class _CustomHeaderForMenu extends StatefulWidget
     this.userName,
     this.userRoleDisplay,
     this.userInstitutionName,
+    this.userRole, // <-- ADD THIS LINE
   });
 
   @override
@@ -90,6 +87,19 @@ class _CustomHeaderForMenuState extends State<_CustomHeaderForMenu> {
                       ),
                     ],
                   ),
+                  // Ikon Chatbot (if you added it)
+                  // Uncomment if ChatbotPage exists and you want the icon
+                  /*
+                  IconButton(
+                    icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ChatbotPage()),
+                      );
+                    },
+                  ),
+                  */
                   // Ikon menu
                   IconButton(
                     icon: const Icon(Icons.menu, color: Colors.white),
@@ -132,11 +142,22 @@ class _CustomHeaderForMenuState extends State<_CustomHeaderForMenu> {
                   // Bagian "Upload Menu"
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const UploadMenuPage()),
-                      );
+                      // Check user role before navigating
+                      if (widget.userRole == 'catering') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const UploadMenuPage()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Hanya Admin Catering yang dapat mengunggah menu.'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
                     },
                     child: const Text(
                       'Upload Menu',
@@ -171,10 +192,10 @@ class _MenuHariIniState extends State<MenuHariIni> {
 
   List<MenuData> _allMenusData = []; // Menggunakan model MenuData
   List<MenuData> _filteredMenusData = [];
-  Map<String, String> _cateringsMap =
-      {}; // Mungkin tidak diperlukan lagi jika menuData sudah ada cateringName
+  Map<String, String> _cateringsMap = {};
 
   String? _userName;
+  String? _userRole; // <-- Store the actual user role here
   String? _userRoleDisplay;
   String? _userInstitutionName;
 
@@ -195,6 +216,7 @@ class _MenuHariIniState extends State<MenuHariIni> {
         final data = userDoc.data() as Map<String, dynamic>;
         setState(() {
           _userName = data['name'];
+          _userRole = data['role']; // <-- Assign the role
           _userInstitutionName = data['institutionName'];
           _userRoleDisplay = _mapRoleToDisplay(data['role']);
         });
@@ -265,6 +287,7 @@ class _MenuHariIniState extends State<MenuHariIni> {
         userName: _userName,
         userRoleDisplay: _userRoleDisplay,
         userInstitutionName: _userInstitutionName,
+        userRole: _userRole, // <-- PASS THE USER ROLE HERE
         onMenuPressed: () {
           // Aksi untuk ikon menu di header (menampilkan bottom sheet)
         },

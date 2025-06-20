@@ -91,53 +91,10 @@ class _CustomHeaderProfileState extends State<_CustomHeaderProfile> {
             IconButton(
               icon: const Icon(Icons.menu, color: Colors.white),
               onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return SafeArea(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          ListTile(
-                            leading: const Icon(Icons.home),
-                            title: const Text('Beranda'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              // Kembali ke halaman utama (HomePage)
-                              Navigator.of(context)
-                                  .popUntil((route) => route.isFirst);
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.restaurant_menu),
-                            title: const Text('Menu Hari Ini'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const Menu()),
-                              );
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.logout),
-                            title: const Text('Logout'),
-                            onTap: () async {
-                              Navigator.pop(context);
-                              final AuthService authService = AuthService();
-                              await authService.signOut();
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginPage()),
-                                (Route<dynamic> route) => false,
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                // Menavigasi langsung ke halaman Menu.dart
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Menu()),
                 );
               },
             ),

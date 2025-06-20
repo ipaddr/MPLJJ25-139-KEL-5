@@ -6,6 +6,7 @@ import 'package:bento_buddy/services/auth_service.dart'; // Import AuthService
 import 'package:bento_buddy/login_page.dart'; // Import LoginPage untuk navigasi logout
 import 'package:bento_buddy/sekolah.dart'; // Import model Sekolah dan SekolahPage dari file terpisah
 import 'package:bento_buddy/menu.dart'; // Import menu.dart
+import 'package:bento_buddy/chatbotpage.dart'; // Import ChatbotPage dari file terpisah
 
 // CustomHeader yang disatukan ke dalam file home_page.dart
 class _CustomHeaderInternal extends StatefulWidget
@@ -45,47 +46,76 @@ class _CustomHeaderInternalState extends State<_CustomHeaderInternal> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Image.asset(
-                  'assets/logo.png', // Pastikan aset ini ada
-                  width: 32,
-                  height: 32,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(
-                      Icons.school,
-                      color: Colors.white,
-                      size: 32,
-                    ); // Fallback icon
-                  },
-                ),
-                const SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      widget.userName ?? 'Pengguna',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      widget.userInstitutionName ??
-                          widget.userRoleDisplay ??
-                          'BentoBuddy User',
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ],
-                ),
-              ],
+            // Tombol Kembali (perbaikan untuk memastikan bisa di-pop)
+            IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                if (Navigator.of(context).canPop()) {
+                  Navigator.pop(context); // Kembali ke halaman sebelumnya
+                } else {
+                  // Jika tidak ada halaman sebelumnya, Anda bisa memutuskan
+                  // untuk tidak melakukan apa-apa atau menampilkan pesan
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Tidak ada halaman untuk kembali.')),
+                  );
+                }
+              },
             ),
+            Expanded(
+              child: Row(
+                children: [
+                  Image.asset(
+                    'assets/logo.png', // Pastikan aset ini ada
+                    width: 32,
+                    height: 32,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(
+                        Icons.school,
+                        color: Colors.white,
+                        size: 32,
+                      ); // Fallback icon
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        widget.userName ?? 'Pengguna',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        widget.userInstitutionName ??
+                            widget.userRoleDisplay ??
+                            'BentoBuddy User',
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            // Tombol untuk Chatbot (Mengarahkan ke ChatbotPage dari chatbot.dart)
+            IconButton(
+              icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ChatbotPage()),
+                );
+              },
+            ),
+            // Tombol Menu
             IconButton(
               icon: const Icon(Icons.menu, color: Colors.white),
               onPressed: () {
-                // Menavigasi langsung ke halaman Menu.dart
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const Menu()),
@@ -245,22 +275,21 @@ class _HomePageState extends State<HomePage> {
         ) // Filter hanya sekolah yang disetujui
         .snapshots()
         .listen(
-          (snapshot) {
-            List<Sekolah> loadedSchools =
-                snapshot.docs
-                    .map((doc) => Sekolah.fromFirestore(doc, _cateringsMap))
-                    .toList();
-            setState(() {
-              _allSchoolsData = loadedSchools;
-              _filterSekolah(); // Terapkan filter setelah data dimuat/diperbarui
-            });
-          },
-          onError: (error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error loading schools: $error')),
-            );
-          },
+      (snapshot) {
+        List<Sekolah> loadedSchools = snapshot.docs
+            .map((doc) => Sekolah.fromFirestore(doc, _cateringsMap))
+            .toList();
+        setState(() {
+          _allSchoolsData = loadedSchools;
+          _filterSekolah(); // Terapkan filter setelah data dimuat/diperbarui
+        });
+      },
+      onError: (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading schools: $error')),
         );
+      },
+    );
   }
 
   void _filterSekolah() {
@@ -269,15 +298,14 @@ class _HomePageState extends State<HomePage> {
       if (query.isEmpty) {
         _filteredSchoolsData = _allSchoolsData;
       } else {
-        _filteredSchoolsData =
-            _allSchoolsData
-                .where(
-                  (s) =>
-                      s.nama.toLowerCase().contains(query) ||
-                      s.alamat.toLowerCase().contains(query) ||
-                      (s.cateringName?.toLowerCase().contains(query) ?? false),
-                )
-                .toList();
+        _filteredSchoolsData = _allSchoolsData
+            .where(
+              (s) =>
+                  s.nama.toLowerCase().contains(query) ||
+                  s.alamat.toLowerCase().contains(query) ||
+                  (s.cateringName?.toLowerCase().contains(query) ?? false),
+            )
+            .toList();
       }
     });
   }
@@ -332,26 +360,25 @@ class _HomePageState extends State<HomePage> {
                   _allSchoolsData.isEmpty && _filteredSchoolsData.isEmpty
                       ? const Center(child: CircularProgressIndicator())
                       : ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: _filteredSchoolsData.length,
-                        itemBuilder: (context, index) {
-                          final sekolah = _filteredSchoolsData[index];
-                          return _SchoolCardWidget(
-                            sekolah: sekolah,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) =>
-                                          SekolahPage(sekolahData: sekolah),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _filteredSchoolsData.length,
+                          itemBuilder: (context, index) {
+                            final sekolah = _filteredSchoolsData[index];
+                            return _SchoolCardWidget(
+                              sekolah: sekolah,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        SekolahPage(sekolahData: sekolah),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
                 ],
               ),
             ),

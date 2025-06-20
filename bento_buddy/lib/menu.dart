@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bento_buddy/pengelola_pengajuan_page.dart'; // Import halaman pengelola pengajuan
 import 'package:bento_buddy/login_page.dart'; // Import LoginPage
 import 'package:bento_buddy/services/auth_service.dart'; // Import AuthService
+import 'package:bento_buddy/chatbotpage.dart'; // Import ChatbotPage
 
 class Menu extends StatefulWidget {
   const Menu({super.key});
@@ -101,6 +102,16 @@ class _MenuState extends State<Menu> {
               ],
             ),
             const Spacer(), // Memberikan ruang kosong fleksibel
+            // Ikon Chatbot
+            IconButton(
+              icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ChatbotPage()),
+                );
+              },
+            ),
             // Ikon menu di AppBar (tetap sebagai ikon menu, bisa pop jika ingin menutup menu)
             IconButton(
               icon: const Icon(
@@ -125,7 +136,7 @@ class _MenuState extends State<Menu> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24), // Spasi vertikal
-            // Grid menu item
+            // Grid menu item (semua ditampilkan)
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2, // 2 kolom
@@ -133,58 +144,74 @@ class _MenuState extends State<Menu> {
                 mainAxisSpacing: 24, // Spasi vertikal antar item
                 children: [
                   _buildMenuItem(
-                    context,
-                    'assets/menerima.png', // [Image of Menerima Bantuan Icon]
-                    'Menerima Bantuan',
-                    const DataSekolahPage(), // Navigasi ke DataSekolahPage
-                    // Hanya tampilkan jika peran adalah funder atau sekolah
-                    // _userRole == 'funder' || _userRole == 'school'
-                  ),
+                      context,
+                      'assets/menerima.png', // [Image of Menerima Bantuan Icon]
+                      'Menerima Bantuan',
+                      const DataSekolahPage(),
+                      [
+                        'school',
+                        'catering',
+                        'funder',
+                        'general'
+                      ], // Peran yang diizinkan
+                      "Hanya Admin Pemerintah dan Admin Sekolah yang dapat mengakses ini."),
                   _buildMenuItem(
-                    context,
-                    'assets/belum_menerima.png', // [Image of Belum Menerima Bantuan Icon]
-                    'Belum Menerima Bantuan',
-                    const Blmnerimabantuan(),
-                    // Hanya tampilkan jika peran adalah funder atau sekolah
-                    // _userRole == 'funder' || _userRole == 'school'
-                  ),
+                      context,
+                      'assets/belum_menerima.png', // [Image of Belum Menerima Bantuan Icon]
+                      'Belum Menerima Bantuan',
+                      const Blmnerimabantuan(),
+                      [
+                        'school',
+                        'catering',
+                        'funder',
+                        'general'
+                      ], // Peran yang diizinkan
+                      "Hanya Admin Pemerintah dan Admin Sekolah yang dapat mengakses ini."),
                   _buildMenuItem(
-                    context,
-                    'assets/Cathering.png', // [Image of Cathering Icon]
-                    'Konfirmasi Bantuan', // Mengarahkan ke PengelolaPengajuanPage
-                    const PengelolaPengajuanPage(),
-                    // Hanya tampilkan jika peran adalah funder
-                    // _userRole == 'funder'
-                  ),
+                      context,
+                      'assets/Cathering.png', // [Image of Cathering Icon]
+                      'Konfirmasi Bantuan',
+                      const PengelolaPengajuanPage(),
+                      ['funder'], // Hanya 'funder' yang diizinkan
+                      "Hanya Admin Pemerintah yang dapat mengakses halaman Konfirmasi Bantuan."),
                   _buildMenuItem(
-                    context,
-                    'assets/ajukan.png', // [Image of Ajukan Sekolah Icon]
-                    'Ajukan Sekolah',
-                    const PengajuanSekolahPage(), // Navigasi ke PengajuanSekolahPage
-                    // Hanya tampilkan jika peran adalah school atau general
-                    // _userRole == 'school' || _userRole == 'general'
-                  ),
+                      context,
+                      'assets/ajukan.png', // [Image of Ajukan Sekolah Icon]
+                      'Ajukan Sekolah',
+                      const PengajuanSekolahPage(),
+                      ['school'], // Hanya 'school' dan 'general' yang diizinkan
+                      "Hanya Admin Sekolah yang dapat mengakses halaman Ajukan Sekolah."),
                   _buildMenuItem(
-                    context,
-                    'assets/laporan.png', // [Image of Laporan Icon]
-                    'Menu', // Label diubah menjadi "Menu" sesuai gambar sebelumnya
-                    const MenuHariIni(), // Navigasi ke MenuHariIni
-                    // Semua peran dapat melihat menu hari ini
-                    // _userRole != null
-                  ),
+                      context,
+                      'assets/laporan.png', // [Image of Laporan Icon]
+                      'Menu',
+                      const MenuHariIni(),
+                      [
+                        'school',
+                        'catering',
+                        'funder',
+                        'general'
+                      ], // Semua peran diizinkan
+                      "" // Tidak perlu pesan jika semua bisa akses, atau sesuaikan
+                      ),
                   _buildMenuItem(
-                    context,
-                    'assets/profil.png', // [Image of Profil Icon]
-                    'Profil',
-                    const ProfilPage(), // Navigasi ke ProfilPage
-                    // Semua peran dapat melihat profil
-                    // _userRole != null
-                  ),
+                      context,
+                      'assets/profil.png', // [Image of Profil Icon]
+                      'Profil',
+                      const ProfilPage(),
+                      [
+                        'school',
+                        'catering',
+                        'funder',
+                        'general'
+                      ], // Semua peran diizinkan
+                      "" // Tidak perlu pesan
+                      ),
                 ],
               ),
             ),
-            // Tombol Logout (Tombol Kembali telah dihapus)
-            const SizedBox(height: 16), // Spasi sebelum tombol logout
+            // Tombol Logout
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
                 print('Logout button pressed.');
@@ -208,26 +235,26 @@ class _MenuState extends State<Menu> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(
                   0xFF1B1464,
-                ), // [Image of Logout Button Color]
-                foregroundColor: Colors.white, // Warna teks putih
+                ),
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12), // Sudut membulat
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 40,
                   vertical: 15,
-                ), // Padding tombol
+                ),
                 minimumSize: const Size(
                   double.infinity,
                   50,
-                ), // Lebar penuh dan tinggi tetap
+                ),
               ),
               child: const Text(
-                'Logout', // [Image of Logout Text]
+                'Logout',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(height: 16), // Spasi di bagian bawah
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -240,18 +267,26 @@ class _MenuState extends State<Menu> {
     String imagePath,
     String label,
     Widget destination,
-    // Tambahkan parameter `bool isVisible` jika Anda ingin mengontrol visibilitas berdasarkan peran
-    // bool isVisible,
+    List<String> allowedRoles, // Parameter baru: Daftar peran yang diizinkan
+    String accessDeniedMessage, // Parameter baru: Pesan ketika akses ditolak
   ) {
-    // if (!isVisible) {
-    //   return const SizedBox.shrink(); // Sembunyikan item jika tidak terlihat
-    // }
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => destination),
-        );
+        // Cek apakah peran pengguna saat ini ada di dalam daftar peran yang diizinkan
+        if (_userRole != null && allowedRoles.contains(_userRole)) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => destination),
+          );
+        } else {
+          // Jika peran tidak diizinkan, tampilkan pesan
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(accessDeniedMessage),
+              duration: const Duration(seconds: 2), // Durasi pesan
+            ),
+          );
+        }
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

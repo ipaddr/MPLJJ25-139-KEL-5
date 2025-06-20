@@ -1,3 +1,4 @@
+import 'package:bento_buddy/menu.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 
@@ -16,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (!mounted) return; // ✅ Cegah error karena context tidak valid
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
+        MaterialPageRoute(builder: (_) => const Menu()),
       );
     });
   }

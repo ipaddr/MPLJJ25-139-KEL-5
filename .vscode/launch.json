@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "bento_buddy",
+            "cwd": "bento_buddy",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "bento_buddy (profile mode)",
+            "cwd": "bento_buddy",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "bento_buddy (release mode)",
+            "cwd": "bento_buddy",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

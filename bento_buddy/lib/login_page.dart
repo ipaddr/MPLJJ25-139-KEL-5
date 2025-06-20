@@ -1,3 +1,4 @@
+import 'package:bento_buddy/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:bento_buddy/home_page.dart'; // Import HomePage yang baru
 import 'register_page.dart'; // Import RegisterPage
@@ -36,10 +37,9 @@ class _LoginPageState extends State<LoginPage> {
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
       ),
-      prefixIcon:
-          prefixIcon != null
-              ? Icon(prefixIcon, color: Colors.grey)
-              : null, // Tambahkan prefixIcon
+      prefixIcon: prefixIcon != null
+          ? Icon(prefixIcon, color: Colors.grey)
+          : null, // Tambahkan prefixIcon
       hintStyle: const TextStyle(color: Colors.grey), // Gaya untuk hint text
     );
   }
@@ -129,18 +129,17 @@ class _LoginPageState extends State<LoginPage> {
                       showDialog(
                         context: context,
                         barrierDismissible: false,
-                        builder:
-                            (context) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
+                        builder: (context) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
                       );
 
                       // Panggil fungsi signIn dari AuthService
-                      String? errorMessage = await _authService
-                          .signInWithEmailPassword(
-                            email: email,
-                            password: password,
-                          );
+                      String? errorMessage =
+                          await _authService.signInWithEmailPassword(
+                        email: email,
+                        password: password,
+                      );
 
                       // Sembunyikan loading spinner
                       Navigator.of(context).pop();
@@ -154,9 +153,8 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const HomePage(), // Mengarahkan ke HomePage
+                            builder: (context) =>
+                                const Menu(), // Mengarahkan ke HomePage
                           ),
                         );
                       } else {

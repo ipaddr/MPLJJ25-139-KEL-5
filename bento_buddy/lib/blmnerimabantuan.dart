@@ -40,22 +40,21 @@ class _BlmnerimabantuanState extends State<Blmnerimabantuan> {
         .where('isApproved', isEqualTo: false)
         .snapshots()
         .listen(
-          (snapshot) {
-            List<Sekolah> loadedSchools =
-                snapshot.docs
-                    .map((doc) => Sekolah.fromFirestore(doc, _cateringsMap))
-                    .toList();
-            setState(() {
-              _allSchoolsData = loadedSchools;
-              _filterSekolah();
-            });
-          },
-          onError: (error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error loading schools: $error')),
-            );
-          },
+      (snapshot) {
+        List<Sekolah> loadedSchools = snapshot.docs
+            .map((doc) => Sekolah.fromFirestore(doc, _cateringsMap))
+            .toList();
+        setState(() {
+          _allSchoolsData = loadedSchools;
+          _filterSekolah();
+        });
+      },
+      onError: (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading schools: $error')),
         );
+      },
+    );
   }
 
   void _filterSekolah() {
@@ -64,12 +63,11 @@ class _BlmnerimabantuanState extends State<Blmnerimabantuan> {
       if (query.isEmpty) {
         _filteredSchoolsData = _allSchoolsData;
       } else {
-        _filteredSchoolsData =
-            _allSchoolsData.where((s) {
-              return s.nama.toLowerCase().contains(query) ||
-                  s.alamat.toLowerCase().contains(query) ||
-                  (s.cateringName?.toLowerCase().contains(query) ?? false);
-            }).toList();
+        _filteredSchoolsData = _allSchoolsData.where((s) {
+          return s.nama.toLowerCase().contains(query) ||
+              s.alamat.toLowerCase().contains(query) ||
+              (s.cateringName?.toLowerCase().contains(query) ?? false);
+        }).toList();
       }
     });
   }
@@ -154,28 +152,26 @@ class _BlmnerimabantuanState extends State<Blmnerimabantuan> {
               ),
             const SizedBox(height: 10),
             Expanded(
-              child:
-                  _allSchoolsData.isEmpty && _filteredSchoolsData.isEmpty
-                      ? const Center(child: CircularProgressIndicator())
-                      : ListView.builder(
-                        itemCount: _filteredSchoolsData.length,
-                        itemBuilder: (context, index) {
-                          final sekolah = _filteredSchoolsData[index];
-                          return SchoolManagedCard(
-                            sekolah: sekolah,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) =>
-                                          SekolahPage(sekolahData: sekolah),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
+              child: _allSchoolsData.isEmpty && _filteredSchoolsData.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: _filteredSchoolsData.length,
+                      itemBuilder: (context, index) {
+                        final sekolah = _filteredSchoolsData[index];
+                        return SchoolManagedCard(
+                          sekolah: sekolah,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    SekolahPage(sekolahData: sekolah),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
             ),
           ],
         ),

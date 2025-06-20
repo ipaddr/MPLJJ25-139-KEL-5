@@ -13,6 +13,7 @@ class AuthService {
     required String password,
     required String fullName,
     required String nik,
+    required String phoneNumber, // DITAMBAHKAN: Parameter phoneNumber
     required String role,
     String? institutionName,
     String? institutionAddress,
@@ -24,12 +25,14 @@ class AuthService {
       User? user = userCredential.user;
 
       if (user != null) {
-        // Simpan data pengguna tambahan ke Firestore
+        // Simpan data pengguna tambahan ke Firestore di koleksi 'users'
         await _firestore.collection('users').doc(user.uid).set({
           'uid': user.uid,
           'email': email,
           'name': fullName,
           'nik': nik,
+          'phoneNumber':
+              phoneNumber, // DITAMBAHKAN: Simpan phoneNumber di koleksi 'users'
           'role': _mapStatusToRole(
             role,
           ), // Mengonversi status dropdown ke role yang sesuai
@@ -38,7 +41,8 @@ class AuthService {
           'createdAt': Timestamp.now(),
         });
 
-        // Jika role adalah 'school', buat dokumen di koleksi schools
+        // Logika tambahan berdasarkan role
+        // Jika role adalah 'school' (Admin Sekolah), buat dokumen di koleksi schools
         if (_mapStatusToRole(role) == 'school') {
           await _firestore.collection('schools').doc().set({
             'schoolName':
@@ -54,13 +58,14 @@ class AuthService {
             'createdAt': Timestamp.now(),
           });
         }
-        // Jika role adalah 'catering', buat dokumen di koleksi caterings
+        // Jika role adalah 'catering' (Admin Catering), buat dokumen di koleksi caterings
         else if (_mapStatusToRole(role) == 'catering') {
           await _firestore.collection('caterings').doc().set({
             'cateringName':
                 institutionName, // Gunakan nama instansi sebagai nama katering
             'contactPerson': fullName, // Nama lengkap sebagai kontak person
-            'phoneNumber': null, // Bisa ditambahkan nanti
+            'phoneNumber':
+                phoneNumber, // DITAMBAHKAN: Simpan phoneNumber di koleksi 'caterings'
             'address':
                 institutionAddress, // Alamat instansi sebagai alamat katering
             'schoolsServed':
